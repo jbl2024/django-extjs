@@ -7,7 +7,7 @@ class Author(models.Model):
             ('MRS', _('Mrs.')),
             ('MS', _('Ms.')),
     )
-    name = models.CharField(max_length=100)
+    name = models.CharField(max_length=100, default="Platon")
     title = models.CharField(max_length=3, choices=TITLE_CHOICES)
     birth_date = models.DateField(blank=True, null=True)
 
