@@ -32,8 +32,6 @@ class VirtualField(object):
     def __init__(self, name):
         self.name = name
 
-
-        
 class ModelGrid(object):
 
     def __init__(self, model):

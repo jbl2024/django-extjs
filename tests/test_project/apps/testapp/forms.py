@@ -23,3 +23,11 @@ class WhatamessForm(forms.ModelForm):
         model = Whatamess
 
 extjs.register(WhatamessForm)
+
+class AuthorxcludeForm(forms.ModelForm):
+    class Meta:
+        model = Author
+        exclude = ('title',)
+
+extjs.register(AuthorxcludeForm)
+

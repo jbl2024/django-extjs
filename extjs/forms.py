@@ -44,6 +44,6 @@ class ExtJsForm(object):
     def as_extjsfields(self, excludes = []):
         """Return field of Form in list
         """
-        raise NotImplemented("Not used for the moment")
+        raise NotImplemented("Not used")
 
 
