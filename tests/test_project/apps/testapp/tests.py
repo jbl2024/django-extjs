@@ -9,18 +9,18 @@ class SimpleTestCase(TestCase):
     def testFormbasic(self):
         cf = ContactForm()
         expct = {"items":[
-            {"allowBlank":False,"fieldLabel":"subject","xtype":"textfield","maxLength":100,"value":"","name":"subject"},
-            {"allowBlank":False,"fieldLabel":"message","xtype":"textfield","value":"pony","name":"message"},
-            {"vtype":"email","fieldLabel":"sender","xtype":"textfield","allowBlank":False,"value":"","name":"sender"},
-            {"allowBlank":True,"checked":"","xtype":"checkbox","fieldLabel":"cc_myself","value":"","name":"cc_myself"}
+            {u'fieldLabel': u'subject', u'xtype': u'textfield', u'required': True, u'value': u'', u'name': u'subject', u'maxLength': 100, u'allowBlank': False},
+            {u'fieldLabel': u'message', u'name': u'message', u'required': True, u'value': u'pony', u'allowBlank': False, u'xtype': u'textfield'},
+            {u'vtype': u'email', u'fieldLabel': u'sender', u'allowBlank': False, u'required': True, u'value': u'', u'name': u'sender', u'xtype': u'textfield'},
+            {u'fieldLabel': u'cc_myself', u'name': u'cc_myself', u'required': False, u'value': u'', u'allowBlank': True, u'xtype': u'checkbox'},
         ]}
         self.assertEqual(expct, simplejson.loads(cf.as_extjs()))
 
     def testModelFormbasic(self):
         cf = AuthorForm()
         expct = u'{"items":['
-        expct += u'{"allowBlank":false,"fieldLabel":"Name","xtype":"textfield","maxLength":100,"value":"","name":"name"},'
-        expct += u'{"displayField":"display","forceSelection":true,"fieldLabel":"Title","xtype":"combo","name":"title","editable":false,"blankText":"title :","hiddenName":"title","valueField":"id","allowBlank":false,"value":"","triggerAction":"all","store":new Ext.data.SimpleStore({fields: [\'id\',\'display\'],  data : [["","---------"],["MR","Mr."],["MRS","Mrs."],["MS","Ms."]] }),"mode":"local"},'
-        expct += u'{"allowBlank":true,"fieldLabel":"Birth date","xtype":"datefield","format":"Y-m-d","value":"","name":"birth_date"}'
+        expct += u'{"fieldLabel":"Name","xtype":"textfield","required":true,"value":"","allowBlank":false,"maxLength":100,"name":"name"},'
+        expct += u'{"displayField":"display","forceSelection":true,"fieldLabel":"Title","xtype":"combo","required":true,"editable":true,"value":"","hiddenName":"title","typeAhead":true,"allowBlank":false,"blankText":"title :","valueField":"id","mode":"local","triggerAction":"all","store":new Ext.data.SimpleStore({fields: [\'id\',\'display\'],  data : [["","---------"],["MR","Mr."],["MRS","Mrs."],["MS","Ms."]] }),"name":"title"},'
+        expct += u'{"fieldLabel":"Birth date","xtype":"datefield","format":"Y-m-d","required":false,"value":"","allowBlank":true,"name":"birth_date"}'
         expct += u']}'
         self.assertEqual(expct, cf.as_extjs())
