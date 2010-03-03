@@ -1,11 +1,11 @@
 from django.db import models
-
+from django.utils.translation import ugettext_lazy as _
 
 class Author(models.Model):
     TITLE_CHOICES = (
-            ('MR', 'Mr.'),
-            ('MRS', 'Mrs.'),
-            ('MS', 'Ms.'),
+            ('MR', _('Mr.')),
+            ('MRS', _('Mrs.')),
+            ('MS', _('Ms.')),
     )
     name = models.CharField(max_length=100)
     title = models.CharField(max_length=3, choices=TITLE_CHOICES)

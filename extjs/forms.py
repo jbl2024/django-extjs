@@ -54,6 +54,7 @@ def getFieldConfig(field_name, django_field, value = None):
 
     config = {}
 
+    # Get initial config value
     if value:
         config['value'] = value
     elif hasattr(ofield, 'initial'):
@@ -96,7 +97,7 @@ def getFieldConfig(field_name, django_field, value = None):
         #print field_class_name, form_field.choices
         #for i in form_field.choices:
          #   print i
-        choices = [[c[0], c[1]] for c in choices]
+        choices = [[c[0], unicode(c[1])] for c in choices]
         # if field_class_name == 'ForeignKey' and not getattr(ofield, 'choices', None):
             # choices = [[c[0], c[1]] for c in ]
 
