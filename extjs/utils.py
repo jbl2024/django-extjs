@@ -1,5 +1,13 @@
 import datetime
 import pickle
+from copy import copy, deepcopy
+from django import forms
+from django.core.serializers.json import DjangoJSONEncoder
+from django.forms import fields
+from django.forms.models import ModelChoiceField, ModelMultipleChoiceField
+from django.forms.forms import BoundField
+
+
 
 # extjs special encoder
 from django.http import Http404, HttpResponse, HttpResponseRedirect
@@ -110,47 +118,11 @@ def JsonSuccess(params = {}):
 def JsonError(error = ''):
     return JsonResponse('{"success":false, "msg":%s}' % JSONserialise(error))
     
-    
-def JSONserialise(obj, sep = '"', escapeStrings = True):
-    import decimal
-    from django.db import models
-    
-    if type(obj)==type({}):
-        return JSONserialise_dict(obj)
-    elif type(obj)==type(True):
-        return obj and "true" or "false"
-    elif type(obj) in [type([]), type((1,2))]:
-        # if len(obj) > 50:
-            # print '*********', 'list', len(obj), type(obj)
-        return "[%s]" % ','.join(map(JSONserialise, obj))
-        # data = []
-        # for item in obj:
-            # data.append(JSONserialise(item))
-        # return "[%s]" % ",".join(data)
-    elif type(obj) in [type(0), type(0.0), long, decimal.Decimal]:
-        return '%s' % obj
-    elif type(obj) in [datetime.datetime , datetime.date]:
-         return u'%s%s%s' % (sep, obj, sep)
-         
-    elif type(obj) in [type(''), type(u'')] or isinstance(obj, models.Model):
-        #print obj, isinstance(obj, str), isinstance(obj, unicode)
-        if obj == "False": 
-           return "false"
-        elif obj == "True":
-            return "true"
-        else:
-            if escapeStrings:
-                return u'%s%s%s' % (sep, JsonCleanstr(obj), sep)
-            else:
-                return u'%s%s%s' % (sep, obj, sep)
-    elif not obj:   
-        return u'%s%s' % (sep, sep)
-    else:   
-        
-        print 'JSONserialise unknown type', obj, type(obj), obj.__class__.__name__, isinstance(obj, models.Model)
-        return u'%s' % obj
-    return None
-    
+def JSONserialise(obj):
+    import simplejson
+    return simplejson.dumps(obj, cls=ExtJsEncoder,)
+
+
 def JSONserialise_dict_item(key, value, sep = '"'):
     # quote the value except for ExtJs keywords
     
@@ -181,3 +153,191 @@ def JsonCleanstr(inval):
     inval = inval.replace('"',r'\"')
     inval = inval.replace('\n','\\n').replace('\r','')
     return inval
+
+
+class ExtJSONEncoder(DjangoJSONEncoder):
+    """
+    JSONEncoder subclass that knows how to encode django forms into ExtJS config objects.
+    """
+
+    CHECKBOX_EDITOR = {
+        'xtype': 'checkbox'
+    }
+    COMBO_EDITOR = {
+        'listWidth': 'auto',
+        'value': '',
+        'mode': 'local',
+        'width': 150,
+        'xtype': 'combo'
+    }
+    DATE_EDITOR = {
+        'xtype': 'datefield'
+    }
+    EMAIL_EDITOR = {
+        'vtype':'email',
+        'xtype': 'textfield'
+    }
+    NUMBER_EDITOR = {
+        'xtype': 'numberfield'
+    }
+    NULL_EDITOR = {
+        'fieldHidden': True,
+        'xtype': 'textfield'
+    }
+    TEXT_EDITOR = {
+        'xtype': 'textfield'
+    }
+    TIME_EDITOR = {
+        'xtype': 'timefield'
+    }
+    URL_EDITOR = {
+        'vtype':'url',
+        'xtype': 'textfield'
+    }
+    CHAR_PIXEL_WIDTH = 8
+
+    EXT_DEFAULT_CONFIG = {
+        'xtype': 'textfield',
+        'labelWidth': 300,
+        'autoWidth': True,
+    }
+
+    DJANGO_EXT_FIELD_TYPES = {
+        fields.BooleanField: ["Ext.form.Checkbox", CHECKBOX_EDITOR],
+        fields.CharField: ["Ext.form.TextField", TEXT_EDITOR],
+        fields.ChoiceField: ["Ext.form.ComboBox", COMBO_EDITOR],
+        fields.TypedChoiceField: ["Ext.form.ComboBox", COMBO_EDITOR],
+        fields.DateField: ["Ext.form.DateField", DATE_EDITOR],
+        fields.DateTimeField: ["Ext.form.DateField", DATE_EDITOR],
+        fields.DecimalField: ["Ext.form.NumberField", NUMBER_EDITOR],
+        fields.EmailField: ["Ext.form.TextField", EMAIL_EDITOR],
+        fields.IntegerField: ["Ext.form.NumberField", NUMBER_EDITOR],
+        ModelChoiceField: ["Ext.form.ComboBox", COMBO_EDITOR],
+        ModelMultipleChoiceField: ["Ext.form.ComboBox", COMBO_EDITOR],
+        fields.MultipleChoiceField: ["Ext.form.ComboBox",COMBO_EDITOR],
+        fields.NullBooleanField: ["Ext.form.Checkbox", CHECKBOX_EDITOR],
+        fields.SplitDateTimeField: ["Ext.form.DateField", DATE_EDITOR],
+        fields.TimeField: ["Ext.form.DateField", TIME_EDITOR],
+        fields.URLField: ["Ext.form.TextField", URL_EDITOR],
+    }
+
+    EXT_DATE_ALT_FORMATS = 'm/d/Y|n/j/Y|n/j/y|m/j/y|n/d/y|m/j/Y|n/d/Y|m-d-y|m-d-Y|m/d|m-d|md|mdy|mdY|d|Y-m-d'
+
+    EXT_TIME_ALT_FORMATS = 'm/d/Y|m-d-y|m-d-Y|m/d|m-d|d'
+
+    DJANGO_EXT_FIELD_ATTRS = {
+        #Key: django field attribute name
+        #Value: tuple[0] = ext field attribute name,
+        #       tuple[1] = default value
+        'choices': ['store', None],
+        #'default': ['value', None],
+        'fieldset': ['fieldSet', None],
+        'help_text': ['helpText', None],
+        'initial': ['value', None],
+        'label': ['fieldLabel', None],
+        'max_length': ['maxLength', None],
+        'max_value': ['maxValue', None],
+        'min_value': ['minValue', None],
+        'name': ['name', None],
+        'required': ['allowBlank', False],
+        'size': ['width', None],
+        'hidden': ['fieldHidden', False],
+        'value': ['value', False],
+    }
+
+    def default(self, o):
+        if issubclass(o.__class__, forms.Form) or issubclass(o.__class__, forms.ModelForm):
+            flds = []
+
+            for name, field in o.fields.items():
+                if isinstance(field, dict):
+                    field['title'] = name
+                else:
+                    field.name = name
+                # Bound fields with data
+                bf = BoundField(o, field, name)
+                cfg = self.default(bf)
+                flds.append(cfg)
+
+            return flds
+        elif isinstance(o, dict):
+            #Fieldset
+            default_config = {
+                'autoHeight': True,
+                'collapsible': True,
+                'items': [],
+                'labelWidth': 200,
+                'title': o['title'],
+                'xtype':'fieldset',
+            }
+            del o['title']
+
+            #Ensure fields are added sorted by position
+            for name, field in sorted(o.items()):
+                field.name = name
+                default_config['items'].append(self.default(field))
+            return default_config
+        elif issubclass(o.__class__, BoundField):
+            #print o.field.__class__
+            default_config = {}
+            if o.field.__class__ in self.DJANGO_EXT_FIELD_TYPES:
+                default_config.update(self.DJANGO_EXT_FIELD_TYPES[o.field.__class__][1])
+                #print default_config
+            else:
+                default_config.update(self.EXT_DEFAULT_CONFIG['editor'])
+            config = deepcopy(default_config)
+            for dj, ext in self.DJANGO_EXT_FIELD_ATTRS.items():
+                v = None
+                # Adapt the value with type of field
+                if dj == 'size':
+                    v = o.field.widget.attrs.get(dj, None)
+                    if v is not None:
+                        if o.field.__class__ in (fields.DateField, fields.DateTimeField, fields.SplitDateTimeField, fields.TimeField):
+                            v += 8
+                        #Django's size attribute is the number of characters,
+                        #so multiply by the pixel width of a character
+                        v = v * self.CHAR_PIXEL_WIDTH
+                elif dj == 'hidden':
+                    v = o.field.widget.attrs.get(dj, default_config.get('fieldHidden', ext[1]))
+                elif dj == 'name':
+                    v = o.field.name
+                elif dj == 'value':
+                    v = o.data
+                elif dj == 'label':
+                    v = o.field.widget.attrs.get(dj, None)
+                    if v is None:
+                        v = o.field.name
+                elif getattr(o.field, dj, ext[1]) is None:
+                    pass
+                elif isinstance(ext[1], basestring):
+                    v = getattr(o.field, dj, getattr(field, ext[1]))
+                elif dj == 'choices':
+                    v = getattr(o.field, dj, None)
+                else:
+                    v = getattr(o.field, dj, ext[1])
+
+
+                #print dj, ext, v
+                #print
+                # Time to use v
+                if v is not None:
+                    ejs, df = ext # extjsfield name, default value
+                    if ejs == 'value':
+                        config[ejs] = v
+                    if ejs == 'name':
+                        config[ejs] = v
+                        config['header'] = v
+                    elif ejs not in ('dataIndex', 'fieldLabel', 'header', 'defaultValue'):
+                        if ejs == 'store':
+                            config[ejs] = [ [y, unicode(z)] for y, z in v]
+                        else:
+                            config[ejs] = v
+
+                    elif isinstance(v, unicode):
+                        config[ext[0]] = v.encode('utf8')
+                    else:
+                        config[ext[0]] = v
+            return config
+        else:
+            return super(ExtJSONEncoder, self).default(o)
+

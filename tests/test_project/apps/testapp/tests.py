@@ -8,19 +8,20 @@ from test_project.apps.testapp.forms import ContactForm, AuthorForm
 class SimpleTestCase(TestCase):
     def testFormbasic(self):
         cf = ContactForm()
+        from extjs.utils import ExtJSONEncoder
         expct = {"items":[
-            {u'fieldLabel': u'subject', u'xtype': u'textfield', u'required': True, u'value': u'', u'name': u'subject', u'maxLength': 100, u'allowBlank': False},
-            {u'fieldLabel': u'message', u'name': u'message', u'required': True, u'value': u'pony', u'allowBlank': False, u'xtype': u'textfield'},
-            {u'vtype': u'email', u'fieldLabel': u'sender', u'allowBlank': False, u'required': True, u'value': u'', u'name': u'sender', u'xtype': u'textfield'},
-            {u'fieldLabel': u'cc_myself', u'name': u'cc_myself', u'required': False, u'value': u'', u'allowBlank': True, u'xtype': u'checkbox'},
+            {'fieldLabel': 'subject', 'xtype': 'textfield', 'fieldHidden': False, 'name': 'subject', 'header': 'subject', 'helpText': '', 'maxLength': 100, 'allowBlank': True},
+            {'fieldLabel': 'message', 'xtype': 'textfield', 'fieldHidden': False, 'value': 'pony', 'name': 'message', 'header': 'message', 'helpText': '', 'allowBlank': True},
+            {'vtype': 'email', 'fieldLabel': 'sender', 'allowBlank': True, 'fieldHidden': False, 'name': 'sender', 'header': 'sender', 'helpText': '', 'xtype': 'textfield'},
+            {'fieldLabel': 'cc_myself', 'xtype': 'checkbox', 'fieldHidden': False, 'value': False, 'name': 'cc_myself', 'header': 'cc_myself', 'helpText': '', 'allowBlank': False},
         ]}
         self.assertEqual(expct, simplejson.loads(cf.as_extjs()))
 
     def testModelFormbasic(self):
         cf = AuthorForm()
-        expct = u'{"items":['
-        expct += u'{"fieldLabel":"Name","xtype":"textfield","required":true,"value":"","allowBlank":false,"maxLength":100,"name":"name"},'
-        expct += u'{"displayField":"display","forceSelection":true,"fieldLabel":"Title","xtype":"combo","required":true,"editable":true,"value":"","hiddenName":"title","typeAhead":true,"allowBlank":false,"blankText":"title :","valueField":"id","mode":"local","triggerAction":"all","store":new Ext.data.SimpleStore({fields: [\'id\',\'display\'],  data : [["","---------"],["MR","Mr."],["MRS","Mrs."],["MS","Ms."]] }),"name":"title"},'
-        expct += u'{"fieldLabel":"Birth date","xtype":"datefield","format":"Y-m-d","required":false,"value":"","allowBlank":true,"name":"birth_date"}'
-        expct += u']}'
-        self.assertEqual(expct, cf.as_extjs())
+        expct = {"items":[
+            {"fieldLabel": "name", "xtype": "textfield", "fieldHidden": False, "header": "name", "allowBlank": True, "helpText": "", "maxLength": 100, "name": "name"},
+            {"xtype": "combo", "fieldLabel": "title", "name": "title", "header": "title", "fieldHidden": False, "value": "", "width": 150, "allowBlank": True, "helpText": "", "mode": "local", "store": [["", "---------"], ["MR", "Mr."], ["MRS", "Mrs."], ["MS", "Ms."]], "listWidth": "auto"},
+            {"fieldLabel": "birth_date", "allowBlank": False, "fieldHidden": False, "name": "birth_date", "header": "birth_date", "helpText": "", "xtype": "datefield"}
+            ]}
+        self.assertEqual(expct, simplejson.loads(cf.as_extjs()))
