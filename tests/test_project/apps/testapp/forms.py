@@ -1,7 +1,7 @@
 from django import forms
 import extjs
 
-from models import Author
+from models import Author, Whatamess
 
 class ContactForm(forms.Form):
     """ A simple Form"""
@@ -18,3 +18,8 @@ class AuthorForm(forms.ModelForm):
 
 extjs.register(AuthorForm)
 
+class WhatamessForm(forms.ModelForm):
+    class Meta:
+        model = Whatamess
+
+extjs.register(WhatamessForm)

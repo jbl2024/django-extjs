@@ -205,6 +205,7 @@ class ExtJSONEncoder(DjangoJSONEncoder):
     DJANGO_EXT_FIELD_TYPES = {
         fields.BooleanField: ["Ext.form.Checkbox", CHECKBOX_EDITOR],
         fields.CharField: ["Ext.form.TextField", TEXT_EDITOR],
+        fields.SlugField: ["Ext.form.TextField", TEXT_EDITOR],
         fields.ChoiceField: ["Ext.form.ComboBox", COMBO_EDITOR],
         fields.TypedChoiceField: ["Ext.form.ComboBox", COMBO_EDITOR],
         fields.DateField: ["Ext.form.DateField", DATE_EDITOR],
@@ -278,7 +279,7 @@ class ExtJSONEncoder(DjangoJSONEncoder):
                 default_config['items'].append(self.default(field))
             return default_config
         elif issubclass(o.__class__, BoundField):
-            #print o.field.__class__
+            # print o.field.__class__
             default_config = {}
             if o.field.__class__ in self.DJANGO_EXT_FIELD_TYPES:
                 default_config.update(self.DJANGO_EXT_FIELD_TYPES[o.field.__class__][1])
@@ -329,7 +330,7 @@ class ExtJSONEncoder(DjangoJSONEncoder):
                         config['header'] = v
                     elif ejs not in ('dataIndex', 'fieldLabel', 'header', 'defaultValue'):
                         if ejs == 'store':
-                            config[ejs] = [ [y, unicode(z)] for y, z in v]
+                            config[ejs] = [ [unicode(y), unicode(z)] for y, z in v]
                         else:
                             config[ejs] = v
 

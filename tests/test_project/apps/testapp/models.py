@@ -14,3 +14,23 @@ class Author(models.Model):
     def __unicode__(self):
         return self.name
 
+class Whatamess(models.Model):
+    TITLE_CHOICES = (
+            (1, _('Mr.')),
+            (2, _('Mrs.')),
+            (3, _('Ms.')),
+    )
+    name = models.CharField(max_length=100)
+    number = models.IntegerField()
+    slug = models.SlugField()
+    text = models.TextField()
+    author = models.ForeignKey(Author)
+    title = models.PositiveSmallIntegerField(max_length=3, choices=TITLE_CHOICES)
+    birth_date = models.DateTimeField(blank=True, null=True)
+    yesno = models.BooleanField()
+
+    def __unicode__(self):
+        return self.name
+
+    def yes(self):
+        return True
