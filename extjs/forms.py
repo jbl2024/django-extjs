@@ -10,26 +10,21 @@ import utils
 
 
 class ExtJsForm(object):
-    """ 
+    """
         .add a as_extjs method to forms.Form or forms.ModelForm; this method returns a formpanel json config, with all fields, buttons and logic
         .add a as_extjsfields method that returns only the field list. useful if you want to customise the form layout
         .add a html_errorlist to return form validations error for an extjs window
     """
-     
-    
     @classmethod
-    def addto(self, cls):
+    def register(self, cls):
         cls.as_extjsfields = self.as_extjsfields
         cls.as_extjs = self.as_extjs
         cls.html_errorlist = self.html_errorlist
-        # default submit handler 
+        # default submit handler
         handler_submit = "function(btn) {console.log(this, btn);this.findParentByType(this.form_xtype).submitForm()}"
         handler_reset = "function(btn) {console.log(this, btn);this.findParentByType(this.form_xtype).resetForm()}"
-        cls.ext_baseConfig = {
-            
+        cls.ext_baseConfig = { }
 
-        }
-        
     @staticmethod
     def as_extjs(self, excludes = []):
         config = ""
@@ -40,21 +35,21 @@ class ExtJsForm(object):
         #if len(config_dict.items())>0:
             #config = utils.JSONserialise(config_dict)
         return utils.JSONserialise(config_dict)
-        
+
     @staticmethod
     def html_errorlist(self):
         html = ''
         for field, err in self.errors.items():
             html += '<br><b>%s</b> : %s' % (field, err.as_text())
         return html
-        
+
     @staticmethod
     def as_extjsfields(self, excludes = []):
             ext_fields = []
-            
+
             if getattr(self, 'intro', None):
                 ext_fields.append({'style':'padding:5px', 'html':self.intro})
-            
+
             # TODO :
             # fieldsets
             # htmlfield
@@ -62,7 +57,7 @@ class ExtJsForm(object):
             # decimal : max_digits, decimal_places, negative
             # number formatting
             #if getattr(self, 'instance', None):
-                #for lfield in self.instance._meta.fields: 
+                #for lfield in self.instance._meta.fields:
                     #print 'FIELD INSTANCE :', lfield
                     #print dir(lfield)
             #print 'self.fields', self.fields
@@ -77,34 +72,34 @@ class ExtJsForm(object):
                 defaultConfig['name'] = u'%s' % field
                 defaultConfig['fieldLabel'] = u'%s' % (ofield.label or field)
                 defaultConfig['allowBlank'] = not(ofield.required)
-                
+
                 defaultConfig['value'] = ''
                 if self.initial.get(field, '') not in ['', None]:
                     defaultConfig['value'] = self.initial[field]
                 elif ofield.initial:
                     defaultConfig['value'] = ofield.initial
-        
+
                 s = ofield.widget.attrs.get('style', None)
                 if s:
                     defaultConfig['style'] = s
-                    
+
               #  print field, 'initial', ofield.initial, self.initial.get(field, ''), '---'
-              
+
                 # field specific ext params
                 e = getattr(ofield, 'ext', None)
                 if e:
                     for item in e.keys():
                         defaultConfig[item] = e[item]
-                         
+
                 # width based on django widget 'size' attr
                 v = ofield.widget.attrs.get('size', None)
                 if v:
                     defaultConfig['width'] = v * CHAR_PIXEL_WIDTH
-                
+
                 blank_config = {
                     'value':None
                 }
-                    
+
                 # hidden
                 if ofield.widget.__class__.__name__ == 'HiddenInput':
                     extfield = blank_config.copy()
@@ -114,23 +109,23 @@ class ExtJsForm(object):
                     if getattr(self, 'instance', None) and getattr(self.instance, field):
                         extfield['value'] = getattr(self.instance, field)
                     extfield.update(defaultConfig)
-                    ext_fields.append(extfield)                
-                    
+                    ext_fields.append(extfield)
+
                 # foreignkeys or custom choices
                 elif ofield.__class__.__name__ in ['ModelChoiceField', 'TypedChoiceField'] or getattr(ofield, 'choices', None):
                     #extfield = defaultConfig.copy()
                     extfield = blank_config.copy()
-                    extfield['xtype'] = 'combo' 
-                    extfield['blankText'] = field + ' :' 
+                    extfield['xtype'] = 'combo'
+                    extfield['blankText'] = field + ' :'
                     choices= [[c[0], c[1]] for c in ofield.choices]
                     extfield['store'] = "new Ext.data.SimpleStore({fields: ['id','display'],  data : %s })" % ( utils.JSONserialise(choices))
                     extfield['valueField'] = 'id'
                     extfield['displayField'] = 'display'
                     extfield['hiddenName'] = field
-                    if ofield.__class__.__name__  in ['ModelChoiceField', 'TypedChoiceField'] : 
+                    if ofield.__class__.__name__  in ['ModelChoiceField', 'TypedChoiceField'] :
                         extfield['editable'] = False
                         extfield['forceSelection'] = True
-                        
+
                     extfield['mode'] = 'local'
                     extfield['triggerAction'] = 'all'
                     from django.core.exceptions import ObjectDoesNotExist
@@ -142,10 +137,10 @@ class ExtJsForm(object):
                                 extfield['value'] = u'%s' % getattr(self.instance, field)
                     except ObjectDoesNotExist:
                            extfield['value'] = ''
-                                
+
                     extfield.update(defaultConfig)
                     ext_fields.append(extfield)
-                    
+
                 # number field
                 elif ofield.__class__.__name__ in ['DecimalField', 'FloatField', 'IntegerField', 'PositiveIntegerField', 'PositiveSmallIntegerField']:
                     #extfield = defaultConfig.copy()
@@ -154,7 +149,7 @@ class ExtJsForm(object):
                     if getattr(self, 'instance', None) and getattr(self.instance, field):
                         extfield['value'] = getattr(self.instance, field)
                     if  isinstance(ofield, forms.IntegerField):
-                        
+
                         extfield['allowDecimals'] = False
                         # if ofield.__class__.__name__ in ['PositiveIntegerField', 'PositiveSmallIntegerField']:
                         #, 'PositiveSmallIntegerField']:
@@ -162,7 +157,7 @@ class ExtJsForm(object):
                     else:
                         extfield['allowDecimals'] = True
                         extfield['decimalPrecision'] = 2
-                        extfield['decimalSeparator'] = '.'                   
+                        extfield['decimalSeparator'] = '.'
                     extfield.update(defaultConfig)
                     ext_fields.append(extfield)
                 # textfield
@@ -176,19 +171,19 @@ class ExtJsForm(object):
                         extfield['xtype'] = 'textarea'
                         v = ofield.widget.attrs.get('cols', None)
                         if v:
-                            extfield['width'] = int(v) * CHAR_PIXEL_WIDTH 
+                            extfield['width'] = int(v) * CHAR_PIXEL_WIDTH
                             #print extfield['width']
                         v = ofield.widget.attrs.get('rows', None)
                         if v:
                             extfield['height'] = int(v) * CHAR_PIXEL_HEIGHT
                             #print extfield['height']
                     if ofield.min_length:
-                        extfield['minLength'] = ofield.min_length 
+                        extfield['minLength'] = ofield.min_length
                     if ofield.max_length:
                         extfield['maxLength'] = ofield.max_length
                     if getattr(self, 'instance', None) and getattr(self.instance, field, None):
                         extfield['value'] = getattr(self.instance, field)
-                    # if getattr(self, 
+                    # if getattr(self,
                         # extfield
                     extfield.update(defaultConfig)
                     ext_fields.append(extfield)
@@ -230,7 +225,7 @@ class ExtJsForm(object):
                     #extfield = defaultConfig.copy()
                     extfield = blank_config.copy()
                     extfield['xtype'] = 'xdatetime'
-                  #  print 'xdatetime', ofield.initial, extfield['value'] 
+                  #  print 'xdatetime', ofield.initial, extfield['value']
                     # todo : ugly !!
                     date_format = ofield.input_formats[0]
                     (datef, timef) = date_format.split(' ')
@@ -259,7 +254,7 @@ class ExtJsForm(object):
                             extfield['dateConfig'] = {'value':''}
                             extfield['timeConfig'] = {'value':''}
                     extfield.update(defaultConfig)
-                    ext_fields.append(extfield)                
+                    ext_fields.append(extfield)
                 # email
                 elif ofield.__class__.__name__ == 'EmailField':
                     #extfield = defaultConfig.copy()
@@ -275,7 +270,7 @@ class ExtJsForm(object):
                    # print 'BooleanField', u'%s' % ofield.label
                     #extfield = defaultConfig.copy()
                     extfield = blank_config.copy()
-                    
+
                     extfield['xtype'] = 'checkbox'
                     if getattr(self, 'instance', None) and getattr(self.instance, field, -1) != '-1':
                         extfield['value'] = getattr(self.instance, field)
@@ -284,5 +279,5 @@ class ExtJsForm(object):
                         extfield['checked'] = ofield.initial
                     extfield.update(defaultConfig)
                     ext_fields.append(extfield)
-         
+
             return ext_fields
