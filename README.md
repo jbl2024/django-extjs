@@ -140,6 +140,13 @@ There is a full working demo project based on my django-skeleton here : [ExtJs d
   - Grids: auto renderer + editor from choices
   - New FK creation
 
+**Tests :**
+
+  - cd tests
+  - python bootstrap.py
+  - ./bin/buildout.py -v
+  - ./bin/test-1.1 or ./bin/test-1.0
+
   
   [1]: http://docs.djangoproject.com/en/dev/topics/forms/
   [2]: http://docs.djangoproject.com/en/dev/topics/forms/modelforms/
