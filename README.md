@@ -59,7 +59,8 @@ There is a full working demo project based on my django-skeleton here : [ExtJs d
         email = forms.EmailField(label='your email', initial='test@revolunet.com')
         message = forms.CharField(label='your message', widget = forms.widgets.Textarea(attrs={'cols':15, 'rows':5}))
 
-    ExtJsForm.addto(ContactForm)        # new methods added to the form
+    import extjs
+    extjs.register(ContactForm)        # new methods added to the form
             
     # the form view
     def contact_form(request, path = None):
@@ -114,18 +115,8 @@ There is a full working demo project based on my django-skeleton here : [ExtJs d
   - Compatible with Form and ModelForm
   - Convert django form fields and widgets to Ext.form fields
   - Handles date formats, foreignkeys, choicefields
-  - Handles vtypes, required
-  - You can add an 'intro' text to an self-generated form
   - Ajax submits and django validations error messages
   - Forms can be ajax loaded or not
-
-**Flexibility :**
-
-  - You can add fields you need
-  - You can render a full self generated form in ExtJs
-  - Or create a custom ExtJs form using django fields
-  - You can ajax load (or not) your form and inlude it in any Ext component
-  - ExtJs code fully overridable
 
 **Dependencies :**
 

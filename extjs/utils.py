@@ -3,10 +3,17 @@ import pickle
 from copy import copy, deepcopy
 from django import forms
 from django.core.serializers.json import DjangoJSONEncoder
+from django.db import models
 from django.forms import fields
 from django.forms.models import ModelChoiceField, ModelMultipleChoiceField
 from django.forms.forms import BoundField
 from django.http import Http404, HttpResponse, HttpResponseRedirect
+from django.core.serializers.json import Serializer as JSONSerializer
+import simplejson
+from django.utils.functional import Promise
+from django.utils.encoding import force_unicode
+
+
 
 class ExtJSONEncoder(DjangoJSONEncoder):
     """
@@ -192,111 +199,34 @@ class ExtJSONEncoder(DjangoJSONEncoder):
                     else:
                         config[ext[0]] = v
             return config
+        if issubclass(o.__class__, models.Model):
+            print "pinaise"
         else:
+            # Go up
             return super(ExtJSONEncoder, self).default(o)
 
-# =========== TODO : Delete
-def datetimeFromExtDateField(indatestr):
-    if indatestr.count("T")>0:
-        (date, time) = indatestr.split("T")
-        (an, mois, jour) = date.split('-')
-        (h, m, s) = time.split(':')
-        return datetime.datetime(int(an), int(mois), int(jour), int(h), int(m), int(s))
-    elif indatestr.count("/") == '2':
-        if indatestr.count(' ')>0:
-            (date, time) = indatestr.split(" ")
-            (jour, mois, an) = date.split('/')
-            (h, m, s) = time.split(':')
-            return datetime.datetime(int(an), int(mois), int(jour), int(h), int(m), int(s))
-        else:
-            (jour, mois, an) = date.split('/')
-            return datetime.date(int(an), int(mois), int(jour))
-    return None
 
+class ExtJSONSerializer(JSONSerializer):
+    """Convert a queryset into
+    """
+    def end_object(self, obj):
+        """Don't add pk, model"""
+        self.objects["data"].append(self._current)
+        self._current = None
 
-def DateFormatConverter(to_extjs = None, to_python = None):
-    """ convert date formats between ext and python """
-    f = {}
-    f['a'] = 'D'
-    f['A'] = 'l'
-    f['b'] = 'M'
-    f['B'] = 'F'
-    #f['c'] =
-    f['d'] = 'd'
-    f['H'] = 'H'
-    f['I'] = 'h'
-    f['j'] = 'z'
-    f['m'] = 'm'
-    f['M'] = 'i'
-    f['p'] = 'A'
-    f['S'] = 's'
-    f['U'] = 'W'
-    #f['w'] =
-    f['W'] = 'W'
-    #f['x'] =
-    #f['X'] =
-    f['y'] = 'y'
-    f['Y'] = 'Y'
-    f['Z'] = 'T'
-    out = ''
-    if to_extjs:
-        for char in to_extjs.replace('%',''):
-            out += f.get(char, char)
-    elif to_python:
-        for char in to_python:
-            if char in f.values():
-                key = [key for key, val in f.items() if f[key] == char][0]
-                out += '%%%s' % key
-            else:
-                out += char
+    def end_serialization(self):
+        self.options.pop('stream', None)
+        self.options.pop('fields', None)
+        self.options.pop('use_natural_keys', None)
+        extjs = self.options.pop('extjs', None)
+        simplejson.dump(self.objects, self.stream, cls=ExtJSONEncoder, **self.options)
+    def start_serialization(self):
+        self._current = None
+        self.message = getattr(self.options, "message", None)
+        self.objects = {"success": True, "data":[]}
+        if self.message:
+            self.objects["message"] = self.message
 
-    return out
-
-
-
-def JsonResponse(contents, status=200):
-    return HttpResponse(contents, mimetype='text/javascript', status=status)
-
-def JsonSuccess(params = {}):
-    d = {"success":True}
-    d.update(params)
-    return JsonResponse(JSONserialise(d))
-
-def JsonError(error = ''):
-    return JsonResponse('{"success":false, "msg":%s}' % JSONserialise(error))
-
-def JSONserialise(obj):
-    import simplejson
-    return simplejson.dumps(obj, cls=ExtJsEncoder,)
-
-def JSONserialise_dict_item(key, value, sep = '"'):
-    # quote the value except for ExtJs keywords
-    if key in ['renderer', 'editor', 'hidden', 'sortable', 'sortInfo', 'listeners', 'view', 'failure', 'success','scope', 'fn','store','handler','callback']:
-        if u'%s' % value in ['True', 'False']:
-            value = str(value).lower()
-        else:
-            # dont escape strings inside these special values (eg; store data)
-            value = JSONserialise(value, sep='', escapeStrings = False)
-        return '"%s":%s' % (key, value)
-    else:
-        value = JSONserialise(value, sep)
-        return '"%s":%s' % (key, value)
-
-def JSONserialise_dict(inDict):
-    data=[]
-    for key in inDict.keys():
-        data.append(JSONserialise_dict_item(key, inDict[key]))
-    data = ",".join(data)
-    return "{%s}" % data
-
-def JsonCleanstr(inval):
-    try:
-        inval = u'%s' % inval
-    except:
-        print "ERROR nunicoding %s" % inval
-        pass
-    inval = inval.replace('"',r'\"')
-    inval = inval.replace('\n','\\n').replace('\r','')
-    return inval
-# =====================
+def JsonResponse(content, *args, **kwargs):
+    return HttpResponse(content, mimetype='text/javascript', status=status, *args, **kwargs)
 

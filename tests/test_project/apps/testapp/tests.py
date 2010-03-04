@@ -4,8 +4,10 @@ from django.utils import simplejson
 from django.conf import settings
 
 from test_project.apps.testapp.forms import ContactForm, AuthorForm, AuthorxcludeForm, WhatamessForm
+from test_project.apps.testapp.models import Author, Whatamess
 
-class SimpleTestCase(TestCase):
+
+class FormsTestCase(TestCase):
     def testFormbasic(self):
         cf = ContactForm()
         expct = {"items":[
@@ -64,3 +66,26 @@ class SimpleTestCase(TestCase):
             {"fieldLabel": "birth_date", "allowBlank": False, "fieldHidden": False, "name": "birth_date", "header": "birth_date", "helpText": "", "xtype": "datefield"}, {"fieldLabel": "yesno", "xtype": "checkbox", "fieldHidden": False, "value": False, "header": "yesno", "allowBlank": False, "helpText": "", "name": "yesno"}
             ]}
         self.assertEqual(expct, simplejson.loads(cf.as_extjs()))
+
+class GridTestCase(TestCase):
+    def setUp(self):
+        """
+        """
+        from datetime import date
+        self.auth1 = Author.objects.create(name="toto", title="ToTo", birth_date=date(2000,1,2))
+        self.auth2 = Author.objects.create(name="tata", title="TaTa", birth_date=date(2001,2,3))
+        self.auth3 = Author.objects.create(name="tutu", title="TuTu", birth_date=date(2002,3,4))
+
+    def testFormbasic(self):
+        qry = Author.objects.all()
+        expct = {u"success": True, u"data": [
+            {u"birth_date": u"2000-01-02", u"name": u"toto", u"title": u"ToTo"},
+            {u"birth_date": u"2001-02-03", u"name": u"tata", u"title": u"TaTa"},
+            {u"birth_date": u"2002-03-04", u"name": u"tutu", u"title": u"TuTu"},
+        ]}
+        from extjs.grids import ModelGrid
+        grid = ModelGrid(Author)
+        jsonresult = grid.get_rows(qry)
+        result = simplejson.loads(jsonresult)
+        self.assertEqual(expct, result)
+
