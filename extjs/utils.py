@@ -228,5 +228,8 @@ class ExtJSONSerializer(JSONSerializer):
             self.objects["message"] = self.message
 
 def JsonResponse(content, *args, **kwargs):
-    return HttpResponse(content, mimetype='text/javascript', status=status, *args, **kwargs)
+    return HttpResponse(content, mimetype='text/javascript', *args, **kwargs)
 
+def JsonError(error = ''):
+    result = {"success": False, "msg": error }
+    return JsonResponse(simplejson.dumps(result, cls=ExtJSONEncoder))
