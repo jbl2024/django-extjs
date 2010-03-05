@@ -28,7 +28,10 @@ class ExtJSONEncoder(DjangoJSONEncoder):
         'value': '',
         'mode': 'local',
         'width': 150,
-        'xtype': 'combo'
+        'xtype': 'combo',
+        'forceSelection': True,
+        'editable': False,
+        'triggerAction': 'all',
     }
     DATE_EDITOR = {
         'xtype': 'datefield'
@@ -188,6 +191,8 @@ class ExtJSONEncoder(DjangoJSONEncoder):
                     if ejs == 'name':
                         config[ejs] = v
                         config['header'] = v
+                        if default_config == self.COMBO_EDITOR:
+                            config['hiddenName'] = v
                     elif ejs not in ('dataIndex', 'fieldLabel', 'header', 'defaultValue'):
                         if ejs == 'store':
                             config[ejs] = [ [unicode(y), unicode(z)] for y, z in v]
