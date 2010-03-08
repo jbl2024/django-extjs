@@ -5,6 +5,7 @@ from django.conf import settings
 
 from test_project.apps.testapp.forms import ContactForm, AuthorForm, AuthorxcludeForm, WhatamessForm
 from test_project.apps.testapp.models import Author, Whatamess
+from test_project.apps.testapp.models import AuthorGrid
 
 
 class FormsTestCase(TestCase):
@@ -70,9 +71,8 @@ class GridTestCase(TestCase):
             {u"birth_date": u"2001-02-03", u"name": u"tata", u"title": u"TaTa"},
             {u"birth_date": u"2002-03-04", u"name": u"tutu", u"title": u"TuTu"},
         ]}
-        from extjs.grids import ModelGrid
-        grid = ModelGrid(Author)
-        jsonresult = grid.get_rows(qry)
+        ag = AuthorGrid()
+        jsonresult = ag.get_rows(qry)
         result = simplejson.loads(jsonresult)
         self.assertEqual(expct, result)
 

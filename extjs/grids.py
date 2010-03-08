@@ -1,7 +1,7 @@
-
 import utils
 
 import forms
+from django.db import models
 
 # width, dateFormat, renderer, hidden, align, type
 
@@ -34,8 +34,12 @@ class VirtualField(object):
         self.name = name
 
 class ModelGrid(object):
-    def __init__(self, model):
-        self.model = model      # the model to use as reference
+    def __init__(self, model=None):
+        if not getattr(self, "model", None):
+            if not isinstance(model, models.Model):
+                raise IndexError("Please give a Model")
+            else:
+                self.model = model      # the model to use as reference
         self.fields = {}        # holds the fields
 
         model_fields = self.model._meta._fields()
