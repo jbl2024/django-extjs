@@ -105,6 +105,17 @@ class GridTestCase(TestCase):
         result = simplejson.loads(jsonresult)
         self.assertEqual(expct, result)
 
+        # use pre-configured View
+        response = self.client.get("/api/author/getjson")
+        result = simplejson.loads(response.content)
+        expct_data = [
+            ["toto", "ToTo", "2000-01-02"],
+            ["tata", "TaTa", "2001-02-03"],
+            ["tutu", "TuTu", "2002-03-04"],
+        ]
+        expct = {"success": True, "data": expct_data, 'results': 3}
+        self.assertEqual(expct, result)
+
     def testGridstore(self):
         """Get Store config from a grid
         """
