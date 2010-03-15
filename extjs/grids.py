@@ -5,8 +5,6 @@ from django.db import models
 
 # width, dateFormat, renderer, hidden, align, type
 
-
-
 class SimpleGrid(object):
     def to_grid(self, fields, rows, totalcount = None, json_add = {}, sort_field = 'id', sort_direction = 'DESC'):
         if not totalcount:
@@ -34,19 +32,41 @@ class VirtualField(object):
         self.name = name
 
 class ModelGrid(object):
-    def __init__(self, model=None):
-        if not getattr(self, "model", None):
-            if not isinstance(model, models.Model):
-                raise IndexError("Please give a Model")
-            else:
-                self.model = model      # the model to use as reference
-        self.fields = {}        # holds the fields
+    fields = None
+    #exclude = None
+    model = None
+
+    def __init__(self, model=None, exclude=None, fields=None):
+        """ Initialize the grid with params given on ModelGrid Definition or
+        __init__
+        """
+        # Model
+        model = model or self.model
+        if not model or not issubclass(model, models.Model):
+            raise IndexError("Please give a Model")
+        else:
+            self.model = model      # the model to use as reference
+
+        # Excludes and Includes
+        #exclude = exclude or self.exclude
+        fields = fields or self.fields
+
+        self.columns = {}        # holds the fields
 
         model_fields = self.model._meta._fields()
         base_fields = model_fields
 
-
+        # Get good field config for fields
         for field in base_fields:
+            # Excludes and includes
+            if fields:
+                if field.name not in fields:
+                    continue
+            #elif exclude:
+            #    if field.name in exclude:
+            #        continue
+
+            # XXX VirtualField  : wtf ?
             if field.__class__.__name__ == VirtualField:
                 self.fields.append(self.Meta.fields_conf[field.name])
                 continue
@@ -57,24 +77,24 @@ class ModelGrid(object):
 
             if field.name == 'id':
                 fdict['id']='id'
-            if  field.__class__.__name__ == 'DateTimeField':
+            if isinstance(field, models.DateTimeField):
                 fdict['type'] = 'datetime'
                 fdict['xtype'] = 'datecolumn'
                 fdict['dateFormat'] = 'Y-m-d H:i:s'
                 fdict['format'] = 'Y-m-d H:i:s'
-            if  field.__class__.__name__ == 'DateField':
+            elif isinstance(field, models.DateField):
                 fdict['type'] = 'date'
                 fdict['xtype'] = 'datecolumn'
                 fdict['dateFormat'] = 'Y-m-d'
                 fdict['format'] = 'Y-m-d'
-            elif field.__class__.__name__ == 'IntegerField':
+            elif isinstance(field, models.IntegerField):
                 fdict['xtype'] = 'numbercolumn'
-            elif field.__class__.__name__ == 'BooleanField':
+            elif isinstance(field, models.BooleanField):
                 fdict['xtype'] = 'booleancolumn'
-            elif field.__class__.__name__ == 'DecimalField':
+            elif isinstance(field, models.DecimalField):
                 fdict['xtype'] = 'numbercolumn '
                 fdict['renderer'] = 'function(v) {return (v.toFixed && v.toFixed(2) || 0);}'
-            elif  field.__class__.__name__ == 'ForeignKey':
+            elif isinstance(field, models.ForeignKey):
                 pass
             elif field.choices:
                 #print 'FIELD CHOICES', field.choices
@@ -83,20 +103,44 @@ class ModelGrid(object):
                     a[c[0]] = c[1]
                 #fdict['renderer'] = 'function(v) {a = %s; return a[v] || "";}' % utils.JSONserialise(a)
 
-            self.fields[field] = fdict
+            self.columns[field] = fdict
 
-    def get_rows(self, queryset, start=0, limit=0, *args, **kwargs):
+    def get_rows(self, queryset, start=0, limit=0, fields=None, *args, **kwargs):
+        """
+            return list from given queryset
+            order the data based on given field list
+            paging from start,limit
+        """
+        if not fields:
+            fields = [x.name for x in self.model._meta._fields()]
+
+        if limit > 0:
+            queryset = queryset[int(start):int(start) + int(limit)]
+        data = queryset.values_list(*fields)
+
+        return list(data), len(data)
+
+    def get_rows_json(self, queryset, *args, **kwargs):
         """
             return json message from given queryset
             order the data based on given field list
             paging from start,limit
         """
-        rows = []
-        if limit > 0:
-            queryset = queryset[int(start):int(start) + int(limit)]
-        from utils import ExtJSONSerializer
-        s = ExtJSONSerializer()
-        return s.serialize(queryset, **kwargs)
+        data, length = self.get_rows(queryset, *args, **kwargs)
+        from django.core.serializers.json import DjangoJSONEncoder as Djson
+        json_enc = Djson(ensure_ascii=False)
+        result = {"data" : data, "success": True, "results": length}
+        return json_enc.encode(result)
+
+    def to_store(self, fields=None, *args, **kwargs):
+        """Create DataStore for this grid
+        """
+        raise NotImplementedError("Not Ready yet")
+        if not fields:
+            fields = [x.name for x in self.model._meta._fields()]
+
+        field_list = [x for x in self.columns.values() if x['name'] in fields]
+        print field_list
 
 
     def to_grid(self, queryset, start = 0, limit = 0, totalcount = None, json_add = {}, sort_field = 'id', sort_direction = 'DESC'):

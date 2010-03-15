@@ -64,15 +64,69 @@ class GridTestCase(TestCase):
         self.auth2 = Author.objects.create(name="tata", title="TaTa", birth_date=date(2001,2,3))
         self.auth3 = Author.objects.create(name="tutu", title="TuTu", birth_date=date(2002,3,4))
 
+    def testGridbasic_old(self):
+        """Get a query from a GridModel
+        """
+        return
+        #qry = Author.objects.all()
+        #expct = {u"success": True, u"data": [
+        #    {u"birth_date": u"2000-01-02", u"name": u"toto", u"title": u"ToTo"},
+        #    {u"birth_date": u"2001-02-03", u"name": u"tata", u"title": u"TaTa"},
+        #    {u"birth_date": u"2002-03-04", u"name": u"tutu", u"title": u"TuTu"},
+        #]}
+        #ag = AuthorGrid()
+        #jsonresult = ag.get_rows(qry)
+        #result = simplejson.loads(jsonresult)
+        #self.assertEqual(expct, result)
+
     def testGridbasic(self):
+        """Get a query from a GridModel
+        """
         qry = Author.objects.all()
-        expct = {u"success": True, u"data": [
-            {u"birth_date": u"2000-01-02", u"name": u"toto", u"title": u"ToTo"},
-            {u"birth_date": u"2001-02-03", u"name": u"tata", u"title": u"TaTa"},
-            {u"birth_date": u"2002-03-04", u"name": u"tutu", u"title": u"TuTu"},
-        ]}
+        import datetime
+        expct_data = [
+            (u"toto", u"ToTo", datetime.date(2000, 1, 2)),
+            (u"tata", u"TaTa", datetime.date(2001, 2, 3)),
+            (u"tutu", u"TuTu", datetime.date(2002, 3, 4)),
+        ]
         ag = AuthorGrid()
-        jsonresult = ag.get_rows(qry)
+        raw_result, length = ag.get_rows(qry, fields=['name', 'title', 'birth_date'])
+        self.assertEqual(expct_data, raw_result)
+        self.assertEqual(length, 3)
+
+        # And now get result in JSONResponse
+        expct_data = [
+            [u"ToTo", u"2000-01-02", u"toto"],
+            [u"TaTa", u"2001-02-03", u"tata"],
+            [u"TuTu", u"2002-03-04", u"tutu"],
+        ]
+        expct = {u"success": True, u"data": expct_data, u'results': 3}
+        jsonresult = ag.get_rows_json(qry, fields=['title', 'birth_date', 'name'])
         result = simplejson.loads(jsonresult)
         self.assertEqual(expct, result)
 
+    def testGridconfig(self):
+        """Not ready yet
+        """
+        return
+        #expct = {'store': store,
+        columns = [
+            {'header': 'name', 'name': 'name', 'tooltip': u'name'},
+            {'header': 'title', 'name': 'title', 'tooltip': u'title'},
+            {'name': 'birth_date', 'dateFormat': 'Y-m-d', 'format': 'Y-m-d', 'tooltip': u'birth date', 'header': 'birth_date', 'type': 'date','xtype': 'datecolumn'}
+        ]
+        """ expct = {
+                    stripeRows: true,
+                    autoExpandColumn: 'company',
+                    height: 350,
+                    width: 600,
+                    title: 'Array Grid',
+                    // config options for stateful behavior
+                    stateful: true,
+                    stateId: 'grid'        
+                }"""
+        ag = AuthorGrid()
+        ag.to_store()
+        #jsonresult = ag.get_rows(qry)
+        #result = simplejson.loads(jsonresult)
+        #self.assertEqual(expct, result)
