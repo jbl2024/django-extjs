@@ -1,3 +1,4 @@
+#-*- coding: utf-8 -*-
 from django.test import TestCase
 from django.contrib.auth.models import User
 from django.utils import simplejson
@@ -130,6 +131,26 @@ class GridTestCase(TestCase):
         raw_result, length = ag.get_rows(qry,)
         self.assertEqual(expct_data, raw_result)
         self.assertEqual(length, 3)
+
+    def testGridbasic_utf8(self):
+        """Get a query from a GridModel with utf8
+        """
+        # adds utf8 record
+        from datetime import date
+        self.auth4 = Author.objects.create(name="tété", title="TéTé", birth_date=date(2000,1,2))
+        qry = Author.objects.all()
+        # And now get result in JSONResponse
+        expct_data = [
+            [u"ToTo", u"2000-01-02", u"toto"],
+            [u"TaTa", u"2001-02-03", u"tata"],
+            [u"TuTu", u"2002-03-04", u"tutu"],
+            [u"TéTé", u"2000-01-02", u"tété"],
+        ]
+        ag = AuthorGrid()
+        expct = {u"success": True, u"data": expct_data, u'results': 4}
+        jsonresult = ag.get_rows_json(qry, fields=['title', 'birth_date', 'name'])
+        result = simplejson.loads(jsonresult)
+        self.assertEqual(expct, result)
 
     def testGridstore(self):
         """Get Store config from a grid
