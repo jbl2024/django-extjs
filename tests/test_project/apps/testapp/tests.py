@@ -118,6 +118,12 @@ class GridTestCase(TestCase):
         store = ag.to_store()
         expct = {'fields': columns}
         self.assertEqual(expct, store)
+        store = ag.to_store(url="/test/blah")
+        expct = {'fields': columns, 'url': '/test/blah'}
+        self.assertEqual(expct, store)
+
+
+    def testGridconfig(self):
         """ expct = {
                     stripeRows: true,
                     autoExpandColumn: 'company',
@@ -127,7 +133,8 @@ class GridTestCase(TestCase):
                     // config options for stateful behavior
                     stateful: true,
                     stateId: 'grid'        
-                }"""
+        }"""
+        pass
         #jsonresult = ag.get_rows(qry)
         #result = simplejson.loads(jsonresult)
         #self.assertEqual(expct, result)

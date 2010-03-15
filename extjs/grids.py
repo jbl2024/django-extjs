@@ -137,14 +137,16 @@ class ModelGrid(object):
         """
         if not fields:
             fields = self.fields
-        print self.fields
 
         field_list = []
         for field in fields:
             for f in self.columns.values():
                 if f['name'] == field:
                     field_list.append(f)
-        return {'fields': field_list}
+        result = {'fields': field_list}
+        if url:
+            result['url'] = url
+        return result
 
 
     def to_grid(self, queryset, start = 0, limit = 0, totalcount = None, json_add = {}, sort_field = 'id', sort_direction = 'DESC'):
