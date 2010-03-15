@@ -11,6 +11,8 @@ from test_project.apps.testapp.models import AuthorGrid, AuthorGrid_nofields
 
 class FormsTestCase(TestCase):
     def testFormbasic(self):
+        """Test a simple Form
+        """
         cf = ContactForm()
         expct = {"items":[
             {'fieldLabel': 'subject', 'xtype': 'textfield', 'fieldHidden': False, 'name': 'subject', 'header': 'subject', 'helpText': '', 'maxLength': 100, 'allowBlank': True},
@@ -24,6 +26,8 @@ class FormsTestCase(TestCase):
         self.assertEqual(expct, simplejson.loads(cf.as_extjs()))
 
     def testModelFormbasic(self):
+        """Test a ModelForm
+        """
         cf = AuthorForm()
         expct = {"items":[
             {"fieldLabel": "name", "xtype": "textfield", "fieldHidden": False, "header": "name", "allowBlank": True, "helpText": "", "maxLength": 100, "name": "name", "value": "Platon"},
@@ -36,6 +40,8 @@ class FormsTestCase(TestCase):
         self.assertEqual(expct, simplejson.loads(cf.as_extjs()))
 
     def testModelFormcomplex(self):
+        """Test a ModelForm with lot of fields
+        """
         cf = WhatamessForm()
         expct = {"items":[
             {"fieldLabel": "name", "xtype": "textfield", "fieldHidden": False, "header": "name", "allowBlank": True, "helpText": "", "maxLength": 100, "name": "name"},
@@ -49,6 +55,8 @@ class FormsTestCase(TestCase):
         self.assertEqual(expct, simplejson.loads(cf.as_extjs()))
 
     def testModelFormexcludebasic(self):
+        """Test a ModelForm with lot of fields and excludes
+        """
         cf = AuthorxcludeForm()
         expct = {"items":[
             {"fieldLabel": "name", "xtype": "textfield", "fieldHidden": False, "header": "name", "allowBlank": True, "helpText": "", "maxLength": 100, "name": "name", "value": "Platon"},
@@ -64,21 +72,6 @@ class GridTestCase(TestCase):
         self.auth1 = Author.objects.create(name="toto", title="ToTo", birth_date=date(2000,1,2))
         self.auth2 = Author.objects.create(name="tata", title="TaTa", birth_date=date(2001,2,3))
         self.auth3 = Author.objects.create(name="tutu", title="TuTu", birth_date=date(2002,3,4))
-
-    def testGridbasic_old(self):
-        """Get a query from a GridModel
-        """
-        return
-        #qry = Author.objects.all()
-        #expct = {u"success": True, u"data": [
-        #    {u"birth_date": u"2000-01-02", u"name": u"toto", u"title": u"ToTo"},
-        #    {u"birth_date": u"2001-02-03", u"name": u"tata", u"title": u"TaTa"},
-        #    {u"birth_date": u"2002-03-04", u"name": u"tutu", u"title": u"TuTu"},
-        #]}
-        #ag = AuthorGrid()
-        #jsonresult = ag.get_rows(qry)
-        #result = simplejson.loads(jsonresult)
-        #self.assertEqual(expct, result)
 
     def testGridbasic(self):
         """Get a query from a GridModel
