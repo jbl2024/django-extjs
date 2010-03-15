@@ -49,19 +49,20 @@ class ModelGrid(object):
 
         # Excludes and Includes
         #exclude = exclude or self.exclude
-        self.fields = fields or self.fields
 
         self.columns = {}        # holds the fields
 
         model_fields = self.model._meta._fields()
         base_fields = model_fields
 
+        self.fields = fields or self.fields or [ f.name for f in model_fields]
+
         # Get good field config for fields
         for field in base_fields:
             # Excludes and includes
-            if fields:
-                if field.name not in fields:
-                    continue
+            #if fields:
+            #    if field.name not in fields:
+            #        continue
             #elif exclude:
             #    if field.name in exclude:
             #        continue

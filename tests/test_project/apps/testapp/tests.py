@@ -5,7 +5,7 @@ from django.conf import settings
 
 from test_project.apps.testapp.forms import ContactForm, AuthorForm, AuthorxcludeForm, WhatamessForm
 from test_project.apps.testapp.models import Author, Whatamess
-from test_project.apps.testapp.models import AuthorGrid
+from test_project.apps.testapp.models import AuthorGrid, AuthorGrid_nofields
 
 
 class FormsTestCase(TestCase):
@@ -115,6 +115,21 @@ class GridTestCase(TestCase):
         ]
         expct = {"success": True, "data": expct_data, 'results': 3}
         self.assertEqual(expct, result)
+
+    def testGridbasic_nofields(self):
+        """Get a query from a GridModel without fields
+        """
+        qry = Author.objects.all()
+        import datetime
+        expct_data = [
+            (1, u"toto", u"ToTo", datetime.date(2000, 1, 2)),
+            (2, u"tata", u"TaTa", datetime.date(2001, 2, 3)),
+            (3, u"tutu", u"TuTu", datetime.date(2002, 3, 4)),
+        ]
+        ag = AuthorGrid_nofields()
+        raw_result, length = ag.get_rows(qry,)
+        self.assertEqual(expct_data, raw_result)
+        self.assertEqual(length, 3)
 
     def testGridstore(self):
         """Get Store config from a grid

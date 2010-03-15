@@ -41,5 +41,8 @@ class AuthorGrid(grids.ModelGrid):
     model = Author
     fields = ['name', 'title', 'birth_date']
 
+class AuthorGrid_nofields(grids.ModelGrid):
+    model = Author
+
 class WhatamessGrid(grids.ModelGrid):
     model = Whatamess
