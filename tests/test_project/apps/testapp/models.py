@@ -39,4 +39,4 @@ from extjs import grids
 
 class AuthorGrid(grids.ModelGrid):
     model = Author
-
+    fields = ['name', 'title', 'birth_date']

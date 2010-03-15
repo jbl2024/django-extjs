@@ -49,7 +49,7 @@ class ModelGrid(object):
 
         # Excludes and Includes
         #exclude = exclude or self.exclude
-        fields = fields or self.fields
+        self.fields = fields or self.fields
 
         self.columns = {}        # holds the fields
 
@@ -112,7 +112,7 @@ class ModelGrid(object):
             paging from start,limit
         """
         if not fields:
-            fields = [x.name for x in self.model._meta._fields()]
+            fields = self.fields
 
         if limit > 0:
             queryset = queryset[int(start):int(start) + int(limit)]
@@ -132,15 +132,19 @@ class ModelGrid(object):
         result = {"data" : data, "success": True, "results": length}
         return json_enc.encode(result)
 
-    def to_store(self, fields=None, *args, **kwargs):
+    def to_store(self, fields=None, url=None, *args, **kwargs):
         """Create DataStore for this grid
         """
-        raise NotImplementedError("Not Ready yet")
         if not fields:
-            fields = [x.name for x in self.model._meta._fields()]
+            fields = self.fields
+        print self.fields
 
-        field_list = [x for x in self.columns.values() if x['name'] in fields]
-        print field_list
+        field_list = []
+        for field in fields:
+            for f in self.columns.values():
+                if f['name'] == field:
+                    field_list.append(f)
+        return {'fields': field_list}
 
 
     def to_grid(self, queryset, start = 0, limit = 0, totalcount = None, json_add = {}, sort_field = 'id', sort_direction = 'DESC'):
@@ -149,7 +153,6 @@ class ModelGrid(object):
         includes the rows data
         to be used in combination with Ext.ux.AutoGrid
         """
-        raise NotImplementedError("Not Ready yet")
         if not totalcount:
             totalcount = queryset.count()
 

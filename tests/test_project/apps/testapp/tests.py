@@ -90,7 +90,7 @@ class GridTestCase(TestCase):
             (u"tutu", u"TuTu", datetime.date(2002, 3, 4)),
         ]
         ag = AuthorGrid()
-        raw_result, length = ag.get_rows(qry, fields=['name', 'title', 'birth_date'])
+        raw_result, length = ag.get_rows(qry,)
         self.assertEqual(expct_data, raw_result)
         self.assertEqual(length, 3)
 
@@ -105,16 +105,19 @@ class GridTestCase(TestCase):
         result = simplejson.loads(jsonresult)
         self.assertEqual(expct, result)
 
-    def testGridconfig(self):
-        """Not ready yet
+    def testGridstore(self):
+        """Get Store config from a grid
         """
-        return
         #expct = {'store': store,
         columns = [
             {'header': 'name', 'name': 'name', 'tooltip': u'name'},
             {'header': 'title', 'name': 'title', 'tooltip': u'title'},
             {'name': 'birth_date', 'dateFormat': 'Y-m-d', 'format': 'Y-m-d', 'tooltip': u'birth date', 'header': 'birth_date', 'type': 'date','xtype': 'datecolumn'}
         ]
+        ag = AuthorGrid()
+        store = ag.to_store()
+        expct = {'fields': columns}
+        self.assertEqual(expct, store)
         """ expct = {
                     stripeRows: true,
                     autoExpandColumn: 'company',
@@ -125,8 +128,6 @@ class GridTestCase(TestCase):
                     stateful: true,
                     stateId: 'grid'        
                 }"""
-        ag = AuthorGrid()
-        ag.to_store()
         #jsonresult = ag.get_rows(qry)
         #result = simplejson.loads(jsonresult)
         #self.assertEqual(expct, result)
