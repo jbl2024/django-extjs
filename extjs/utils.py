@@ -110,6 +110,9 @@ class ExtJSONEncoder(DjangoJSONEncoder):
     }
 
     def default(self, o):
+        """Serializer
+        """
+        # Serialize : Forms
         if issubclass(o.__class__, forms.Form) or issubclass(o.__class__, forms.ModelForm):
             flds = []
 
@@ -124,6 +127,8 @@ class ExtJSONEncoder(DjangoJSONEncoder):
                 flds.append(cfg)
 
             return flds
+
+        # Serialize : Dict
         elif isinstance(o, dict):
             #Fieldset
             default_config = {
@@ -141,6 +146,8 @@ class ExtJSONEncoder(DjangoJSONEncoder):
                 field.name = name
                 default_config['items'].append(self.default(field))
             return default_config
+
+        # Serialize BoundFields
         elif issubclass(o.__class__, BoundField):
             # print o.field.__class__
             default_config = {}
@@ -166,7 +173,18 @@ class ExtJSONEncoder(DjangoJSONEncoder):
                 elif dj == 'name':
                     v = o.field.name
                 elif dj == 'value':
-                    v = o.data
+                    # Get value depends of source
+                    # http://code.djangoproject.com/browser/django/trunk/django/forms/forms.py#L432
+                    if not o.form.is_bound:
+                        data = o.form.initial.get(o.name, o.field.initial)
+                        if callable(data):
+                            data = data()
+                        # temp hack for Checkbox
+                        if not data and isinstance(o.field, fields.BooleanField):
+                            data = o.data
+                    else:
+                        data = o.data
+                    v = data
                 elif dj == 'label':
                     v = o.field.widget.attrs.get(dj, None)
                     if v is None:

@@ -35,8 +35,18 @@ class FormsTestCase(TestCase):
             {"fieldLabel": "birth_date", "allowBlank": False, "fieldHidden": False, "name": "birth_date", "header": "birth_date", "helpText": "", "xtype": "datefield"}
             ]}
         self.assertEqual(expct, simplejson.loads(cf.as_extjs()))
+
+        # With POST data
         cf = AuthorForm({"name":"PONNY"})
         expct["items"][0]["value"] = "PONNY"
+        self.assertEqual(expct, simplejson.loads(cf.as_extjs()))
+
+        # With an instance
+        from datetime import date
+        auth1 = Author.objects.create(name="toto", title="MR")
+        expct["items"][0]["value"] = "toto"
+        expct["items"][1]["value"] = "MR"
+        cf = AuthorForm(instance=auth1)
         self.assertEqual(expct, simplejson.loads(cf.as_extjs()))
 
     def testModelFormcomplex(self):
@@ -64,7 +74,7 @@ class FormsTestCase(TestCase):
             ]}
         self.assertEqual(expct, simplejson.loads(cf.as_extjs()))
 
-    def testModelFormcomplex(self):
+    def testModelFormComplexwithAuthor(self):
         """Test a ModelForm with lot of fields and an Author
         """
         from datetime import date
