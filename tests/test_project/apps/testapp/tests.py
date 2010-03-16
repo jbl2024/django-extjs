@@ -79,9 +79,9 @@ class GridTestCase(TestCase):
         qry = Author.objects.all()
         import datetime
         expct_data = [
-            (u"toto", u"ToTo", datetime.date(2000, 1, 2)),
-            (u"tata", u"TaTa", datetime.date(2001, 2, 3)),
-            (u"tutu", u"TuTu", datetime.date(2002, 3, 4)),
+            {'name': u"toto", 'title': u"ToTo", 'birth_date': datetime.date(2000, 1, 2)},
+            {'name': u"tata", 'title': u"TaTa", 'birth_date': datetime.date(2001, 2, 3)},
+            {'name': u"tutu", 'title': u"TuTu", 'birth_date': datetime.date(2002, 3, 4)},
         ]
         ag = AuthorGrid()
         raw_result, length = ag.get_rows(qry,)
@@ -90,9 +90,9 @@ class GridTestCase(TestCase):
 
         # And now get result in JSONResponse
         expct_data = [
-            [u"ToTo", u"2000-01-02", u"toto"],
-            [u"TaTa", u"2001-02-03", u"tata"],
-            [u"TuTu", u"2002-03-04", u"tutu"],
+            {'title': u"ToTo", 'birth_date': u"2000-01-02", 'name': u"toto"},
+            {'title': u"TaTa", 'birth_date': u"2001-02-03", 'name': u"tata"},
+            {'title': u"TuTu", 'birth_date': u"2002-03-04", 'name': u"tutu"},
         ]
         expct = {u"success": True, u"data": expct_data, u'results': 3}
         jsonresult = ag.get_rows_json(qry, fields=['title', 'birth_date', 'name'])
@@ -103,9 +103,9 @@ class GridTestCase(TestCase):
         response = self.client.get("/api/author/getjson")
         result = simplejson.loads(response.content)
         expct_data = [
-            ["toto", "ToTo", "2000-01-02"],
-            ["tata", "TaTa", "2001-02-03"],
-            ["tutu", "TuTu", "2002-03-04"],
+            {'name': "toto", 'title': "ToTo", 'birth_date': "2000-01-02"},
+            {'name': "tata", 'title': "TaTa", 'birth_date': "2001-02-03"},
+            {'name': "tutu", 'title': "TuTu", 'birth_date': "2002-03-04"},
         ]
         expct = {"success": True, "data": expct_data, 'results': 3}
         self.assertEqual(expct, result)
@@ -116,9 +116,9 @@ class GridTestCase(TestCase):
         qry = Author.objects.all()
         import datetime
         expct_data = [
-            (1, u"toto", u"ToTo", datetime.date(2000, 1, 2)),
-            (2, u"tata", u"TaTa", datetime.date(2001, 2, 3)),
-            (3, u"tutu", u"TuTu", datetime.date(2002, 3, 4)),
+            {"id": 1, 'name': u"toto", 'title': u"ToTo", 'birth_date': datetime.date(2000, 1, 2)},
+            {"id": 2, 'name': u"tata", 'title': u"TaTa", 'birth_date': datetime.date(2001, 2, 3)},
+            {"id": 3, 'name': u"tutu", 'title': u"TuTu", 'birth_date': datetime.date(2002, 3, 4)},
         ]
         ag = AuthorGrid_nofields()
         raw_result, length = ag.get_rows(qry,)
@@ -132,12 +132,13 @@ class GridTestCase(TestCase):
         from datetime import date
         self.auth4 = Author.objects.create(name="tété", title="TéTé", birth_date=date(2000,1,2))
         qry = Author.objects.all()
+
         # And now get result in JSONResponse
         expct_data = [
-            [u"ToTo", u"2000-01-02", u"toto"],
-            [u"TaTa", u"2001-02-03", u"tata"],
-            [u"TuTu", u"2002-03-04", u"tutu"],
-            [u"TéTé", u"2000-01-02", u"tété"],
+            {'title': u"ToTo", 'birth_date': u"2000-01-02", 'name': u"toto"},
+            {'title': u"TaTa", 'birth_date': u"2001-02-03", 'name': u"tata"},
+            {'title': u"TuTu", 'birth_date': u"2002-03-04", 'name': u"tutu"},
+            {'title': u"TéTé", 'birth_date': u"2000-01-02", 'name': u"tété"},
         ]
         ag = AuthorGrid()
         expct = {u"success": True, u"data": expct_data, u'results': 4}

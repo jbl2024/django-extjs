@@ -117,7 +117,7 @@ class ModelGrid(object):
 
         if limit > 0:
             queryset = queryset[int(start):int(start) + int(limit)]
-        data = queryset.values_list(*fields)
+        data = queryset.values(*fields)
 
         return list(data), len(data)
 
