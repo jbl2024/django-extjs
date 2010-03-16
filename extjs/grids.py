@@ -117,17 +117,8 @@ class ModelGrid(object):
         if not fields:
             fields = self.fields
 
-        # Triage for field vs methods/properties
-        normals, specials = [], []
-        for f in fields:
-            if f not in self.mfields:
-                specials.append(f)
-            else:
-                normals.append(f)
-
         if limit > 0:
             queryset = queryset[int(start):int(start) + int(limit)]
-        data = list(queryset.values(*normals))
 
         # Now update with specials methods
         data = []
