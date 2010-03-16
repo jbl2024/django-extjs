@@ -55,7 +55,9 @@ class ModelGrid(object):
         model_fields = self.model._meta._fields()
         base_fields = model_fields
 
-        self.fields = fields or self.fields or [ f.name for f in model_fields]
+        # Model base fields and needed fields
+        self.mfields = [ f.name for f in model_fields ]
+        self.fields = fields or self.fields or self.mfields
 
         # Get good field config for fields
         for field in base_fields:
@@ -115,11 +117,27 @@ class ModelGrid(object):
         if not fields:
             fields = self.fields
 
+        # Triage for field vs methods/properties
+        normals, specials = [], []
+        for f in fields:
+            if f not in self.mfields:
+                specials.append(f)
+            else:
+                normals.append(f)
+
         if limit > 0:
             queryset = queryset[int(start):int(start) + int(limit)]
-        data = queryset.values(*fields)
+        data = list(queryset.values(*normals))
 
-        return list(data), len(data)
+        # Now update with specials methods
+        data = []
+        for obj in queryset:
+            row = {}
+            for field in fields:
+                row[field] = getattr(obj, field)
+            data.append(row)
+
+        return data, len(data)
 
     def get_rows_json(self, queryset, *args, **kwargs):
         """

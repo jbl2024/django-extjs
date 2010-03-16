@@ -35,14 +35,30 @@ class Whatamess(models.Model):
     def yes(self):
         return True
 
+class AuthorProxy(Author):
+        class Meta:
+            proxy = True
+
+        @property
+        def aprint(self):
+            return "Proxy here : %s" % self.name
+
+#### GRIDS
+
+
 from extjs import grids
 
 class AuthorGrid(grids.ModelGrid):
     model = Author
     fields = ['name', 'title', 'birth_date']
 
+class AuthorGridProxy(grids.ModelGrid):
+    model = AuthorProxy
+
 class AuthorGrid_nofields(grids.ModelGrid):
     model = Author
 
 class WhatamessGrid(grids.ModelGrid):
     model = Whatamess
+
+

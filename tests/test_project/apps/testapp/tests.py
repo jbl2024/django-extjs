@@ -5,8 +5,8 @@ from django.utils import simplejson
 from django.conf import settings
 
 from test_project.apps.testapp.forms import ContactForm, AuthorForm, AuthorxcludeForm, WhatamessForm
-from test_project.apps.testapp.models import Author, Whatamess
-from test_project.apps.testapp.models import AuthorGrid, AuthorGrid_nofields
+from test_project.apps.testapp.models import Author, AuthorProxy, Whatamess
+from test_project.apps.testapp.models import AuthorGrid, AuthorGrid_nofields, AuthorGridProxy
 
 
 class FormsTestCase(TestCase):
@@ -181,6 +181,31 @@ class GridTestCase(TestCase):
         expct = {'fields': columns, 'url': '/test/blah'}
         self.assertEqual(expct, store)
 
+    def testGridProxy(self):
+        """Get a query from a GridModel with proxy and customs methods
+        """
+        qry = AuthorProxy.objects.all()
+        import datetime
+        expct_data = [
+            {'id': 1, 'name': u"toto", 'title': u"ToTo", 'birth_date': datetime.date(2000, 1, 2)},
+            {'id': 2, 'name': u"tata", 'title': u"TaTa", 'birth_date': datetime.date(2001, 2, 3)},
+            {'id': 3, 'name': u"tutu", 'title': u"TuTu", 'birth_date': datetime.date(2002, 3, 4)},
+        ]
+        ag = AuthorGridProxy()
+        raw_result, length = ag.get_rows(qry,)
+        self.assertEqual(expct_data, raw_result)
+        self.assertEqual(length, 3)
+
+        # Use method
+        expct_data = [
+            {'name': u"toto", 'title': u"ToTo", 'birth_date': datetime.date(2000, 1, 2), "aprint" : "Proxy here : toto"},
+            {'name': u"tata", 'title': u"TaTa", 'birth_date': datetime.date(2001, 2, 3), "aprint" : "Proxy here : tata"},
+            {'name': u"tutu", 'title': u"TuTu", 'birth_date': datetime.date(2002, 3, 4), "aprint" : "Proxy here : tutu"},
+        ]
+        ag = AuthorGridProxy()
+        raw_result, length = ag.get_rows(qry, fields=['name', 'title', 'birth_date', 'aprint'])
+        self.assertEqual(expct_data, raw_result)
+        self.assertEqual(length, 3)
 
     def testGridconfig(self):
         """ expct = {
