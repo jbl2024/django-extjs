@@ -7,40 +7,35 @@ Convert your forms.Form and forms.ModelForm to extjs and handles the form submis
 
 Generate custom ExtJs dynamic grids from django querysets. You can also set your grids as Editable.
 
-Tested with ExtJs 3 and Django >= 1 Feedback needed  : <julien@bouquillon.com>
-
 There is a full working demo project based on my django-skeleton here : [ExtJs django-skeleton branch][8] this is where you should start.
 
 **Grid example :**
+    
+    # django models 
+    class Author(models.Model):
+        TITLE_CHOICES = (
+                ('MR', _('Mr.')),
+                ('MRS', _('Mrs.')),
+                ('MS', _('Ms.')),
+        )
+        name = models.CharField(max_length=100, default="Platon")
+        title = models.CharField(max_length=3, choices=TITLE_CHOICES)
+        birth_date = models.DateField(blank=True, null=True)
+
+    from extjs import grids
+    class AuthorGrid(grids.ModelGrid):
+        model = Author
+        fields = ['name', 'title', 'birth_date']
 
     # the django view
+    from extjs import utils
     def users_grid(request):
         # return Json autogrid configuration
-        grid = grids.ModelGrid(User)            # generic grid from model fields (can be customised)
-        users = User.objects.all()              # use any queryset
-        json = grid.to_grid(users, limit = 25)    
-        return utils.JsonResponse(json)
+        grid = AuthorGrid()            # generic grid from model fields
+        authors = Author.objects.all()     # use any queryset
+        jsonrows = grid.get_rows_json(authors)
+        return utils.JsonResponse(jsonrows)
 
-    # the javascript (ExtJs 3) :
-    var users_grid = new Ext.ux.AutoGrid({
-        autoWidth:true
-        ,showBbar:true
-        ,loadMask:true
-        ,store:new Ext.data.JsonStore({
-             autoLoad:true
-            ,remoteSort:true
-            ,proxy:new Ext.data.HttpProxy({
-                 url:'apps/main/users_grid'
-                ,method:'POST'
-            })
-        })
-    });
-
-    var w = new Ext.Window({
-         title:'autogrid !'
-        ,items:users_grid
-    }).show();
-    
 **Form example :**
 
     # the django view
@@ -63,6 +58,8 @@ There is a full working demo project based on my django-skeleton here : [ExtJs d
     extjs.register(ContactForm)        # new methods added to the form
             
     # the form view
+    from extjs import utils
+    import simplejson as json
     def contact_form(request, path = None):
         if request.method == 'POST':
             # handle form submission
@@ -72,43 +69,21 @@ There is a full working demo project based on my django-skeleton here : [ExtJs d
             else:
                 # send your email
                 print 'send a mail'
-            return utils.JsonResponse(utils.JSONserialise({
+            return utils.JsonResponse(json.dumps({
                 'success':True, 
                 'messages': [{'icon':'/core/static/img/famfamfam/accept.png', 'message':'Enregistrement OK'}]
                 }) )
         else:
             # handle form display
             form = ContactForm()
-            return utils.JsonResponse(utils.JSONserialise(form.as_extjsfields()))
+            return utils.JsonResponse(form.as_extjs())
             
 
-    # the javascript (ExtJs 3) :
-    var contact_win = new Ext.Window({
-        title:'django form example'
-        ,width:300
-        ,y:420
-        ,layout:'fit'
-        ,height:300
-        ,items:new Ext.ux.DjangoForm({
-                border:false
-                ,intro:'generated contact form'
-                ,showButtons:true
-                ,showSuccessMessage:'Form submission success'
-                ,url:'apps/main/contact_form' 
-                ,scope:this
-                 ,callback:function(form) {
-                    form.doLayout();
-                 }
-           })
-         ,draggable :true
-    }).show();
-    
 **The lib provides :**
 
   - Django code to render your forms as extjs
   - ExtJs helpers to load/save your forms and models
   - Django code to generate full json to render ExtJS grids with paging (metaData + data)
-  - A special ExtJs json parser (special ExtJs keywords handling)
 
 **Features :**
 
@@ -118,11 +93,6 @@ There is a full working demo project based on my django-skeleton here : [ExtJs d
   - Ajax submits and django validations error messages
   - Forms can be ajax loaded or not
 
-**Dependencies :**
-
-  - The lib includes [Saki's Ext.ux.form.DateTime][4] ExtJs component (LGPL)
-  
-  
 **Todo :** 
 
   - Radio groups
