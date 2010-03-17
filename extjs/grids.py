@@ -130,16 +130,23 @@ class ModelGrid(object):
 
         return data, len(data)
 
-    def get_rows_json(self, queryset, *args, **kwargs):
+    def get_rows_json(self, queryset, jsonerror=True, *args, **kwargs):
         """
             return json message from given queryset
             order the data based on given field list
             paging from start,limit
         """
-        data, length = self.get_rows(queryset, *args, **kwargs)
+        try :
+            data, length = self.get_rows(queryset, *args, **kwargs)
+        except Exception, e:
+            # TODO : replace with loggin solution
+            if not jsonerror:
+                raise e
+            result = {'success': False, "message": "Error : %s" % e}
+        else:
+            result = {"data" : data, "success": True, "results": length}
         from django.core.serializers.json import DjangoJSONEncoder as Djson
         json_enc = Djson(ensure_ascii=False)
-        result = {"data" : data, "success": True, "results": length}
         return json_enc.encode(result)
 
     def to_store(self, fields=None, url=None, *args, **kwargs):

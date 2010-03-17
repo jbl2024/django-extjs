@@ -232,3 +232,22 @@ class GridTestCase(TestCase):
         #jsonresult = ag.get_rows(qry)
         #result = simplejson.loads(jsonresult)
         #self.assertEqual(expct, result)
+
+    def testGridError(self):
+        """Get a error with a query from a GridModel
+        """
+        qry = Author.objects.all()
+        ag = AuthorGrid()
+        # And now get result in JSONResponse
+        expct_data = [
+            {'title': u"ToTo", 'birth_date': u"2000-01-02", 'name': u"toto"},
+            {'title': u"TaTa", 'birth_date': u"2001-02-03", 'name': u"tata"},
+            {'title': u"TuTu", 'birth_date': u"2002-03-04", 'name': u"tutu"},
+        ]
+        expct = {u"success": False, u"message": "Error : 'Author' object has no attribute 'titl'"}
+        jsonresult = ag.get_rows_json(qry, fields=['titl', 'birth_date', 'name'])
+        result = simplejson.loads(jsonresult)
+        self.assertEqual(expct, result)
+        # Without jsonerror we get normal Django's exception
+        self.assertRaises(AttributeError, ag.get_rows_json, qry, fields=['titl', 'birth_date', 'name'], jsonerror=False)
+
