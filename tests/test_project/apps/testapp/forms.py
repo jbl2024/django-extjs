@@ -24,6 +24,15 @@ class WhatamessForm(forms.ModelForm):
 
 extjs.register(WhatamessForm)
 
+class WhatamessFormFK(forms.ModelForm):
+    """Form with ForeignKey and field
+    """
+    class Meta:
+        model = Whatamess
+        fields = ('author',)
+
+extjs.register(WhatamessFormFK)
+
 class AuthorxcludeForm(forms.ModelForm):
     class Meta:
         model = Author

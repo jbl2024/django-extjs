@@ -4,7 +4,7 @@ from django.contrib.auth.models import User
 from django.utils import simplejson
 from django.conf import settings
 
-from test_project.apps.testapp.forms import ContactForm, AuthorForm, AuthorxcludeForm, WhatamessForm
+from test_project.apps.testapp.forms import ContactForm, AuthorForm, AuthorxcludeForm, WhatamessForm, WhatamessFormFK
 from test_project.apps.testapp.models import Author, AuthorProxy, Whatamess
 from test_project.apps.testapp.models import AuthorGrid, AuthorGrid_nofields, AuthorGridProxy
 
@@ -61,6 +61,15 @@ class FormsTestCase(TestCase):
             {"xtype": "combo", "forceSelection": True, "editable": False, "triggerAction": 'all', "hiddenName": "author", "fieldLabel": "author", "name": "author", "header": "author", "fieldHidden": False, "value": "", "width": 150, "allowBlank": True, "helpText": "", "mode": "local", "store": [["", "---------"]], "listWidth": "auto"},
             {"xtype": "combo", "forceSelection": True, "editable": False, "triggerAction": 'all', "hiddenName": "title", "fieldLabel": "title", "name": "title", "header": "title", "fieldHidden": False, "value": "", "width": 150, "allowBlank": True, "helpText": "", "mode": "local", "store": [["", "---------"], ["1", "Mr."], ["2", "Mrs."], ["3", "Ms."]], "listWidth": "auto"},
             {"fieldLabel": "birth_date", "allowBlank": False, "fieldHidden": False, "name": "birth_date", "header": "birth_date", "helpText": "", "xtype": "datefield"}, {"fieldLabel": "yesno", "xtype": "checkbox", "fieldHidden": False, "value": False, "header": "yesno", "allowBlank": False, "helpText": "", "name": "yesno"}
+            ]}
+        self.assertEqual(expct, simplejson.loads(cf.as_extjs()))
+
+    def testModelFormcomplexFK(self):
+        """Test a ModelForm with only one field
+        """
+        cf = WhatamessFormFK()
+        expct = {"items":[
+            {"xtype": "combo", "forceSelection": True, "editable": False, "triggerAction": 'all', "hiddenName": "author", "fieldLabel": "author", "name": "author", "header": "author", "fieldHidden": False, "value": "", "width": 150, "allowBlank": True, "helpText": "", "mode": "local", "store": [["", "---------"]], "listWidth": "auto"},
             ]}
         self.assertEqual(expct, simplejson.loads(cf.as_extjs()))
 
