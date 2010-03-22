@@ -198,9 +198,6 @@ class ExtJSONEncoder(DjangoJSONEncoder):
                 else:
                     v = getattr(o.field, dj, ext[1])
 
-
-                #print dj, ext, v
-                #print
                 # Time to use v
                 if v is not None:
                     ejs, df = ext # extjsfield name, default value
@@ -222,8 +219,8 @@ class ExtJSONEncoder(DjangoJSONEncoder):
                     else:
                         config[ext[0]] = v
             return config
-        if issubclass(o.__class__, models.Model):
-            print "pinaise"
+        elif issubclass(o.__class__, models.Model):
+            return unicode(o)
         else:
             # Go up
             return super(ExtJSONEncoder, self).default(o)

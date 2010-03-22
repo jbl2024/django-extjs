@@ -145,8 +145,8 @@ class ModelGrid(object):
             result = {'success': False, "message": "Error : %s" % e}
         else:
             result = {"data" : data, "success": True, "results": length}
-        from django.core.serializers.json import DjangoJSONEncoder as Djson
-        json_enc = Djson(ensure_ascii=False)
+        from extjs.utils import ExtJSONEncoder as Extjson
+        json_enc = Extjson(ensure_ascii=False)
         return json_enc.encode(result)
 
     def to_store(self, fields=None, url=None, *args, **kwargs):

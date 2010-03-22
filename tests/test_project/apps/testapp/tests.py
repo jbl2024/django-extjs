@@ -6,7 +6,7 @@ from django.conf import settings
 
 from test_project.apps.testapp.forms import ContactForm, AuthorForm, AuthorxcludeForm, WhatamessForm, WhatamessFormFK
 from test_project.apps.testapp.models import Author, AuthorProxy, Whatamess
-from test_project.apps.testapp.models import AuthorGrid, AuthorGrid_nofields, AuthorGridProxy
+from test_project.apps.testapp.models import AuthorGrid, AuthorGrid_nofields, AuthorGridProxy, WhatamessGrid
 
 
 class FormsTestCase(TestCase):
@@ -109,6 +109,9 @@ class GridTestCase(TestCase):
         self.auth1 = Author.objects.create(name="toto", title="ToTo", birth_date=date(2000,1,2))
         self.auth2 = Author.objects.create(name="tata", title="TaTa", birth_date=date(2001,2,3))
         self.auth3 = Author.objects.create(name="tutu", title="TuTu", birth_date=date(2002,3,4))
+        self.wam1 = Whatamess.objects.create(name="dodo", title=1, number=1, text="d o d o", author=self.auth1, yesno=True, birth_date=date(2000,1,2))
+        self.wam2 = Whatamess.objects.create(name="dada", title=1, number=2, text="d a d a", author=self.auth2, yesno=True, birth_date=date(2001,2,3))
+        self.wam3 = Whatamess.objects.create(name="dudu", title=1, number=3, text="d u d u", author=self.auth3, yesno=True, birth_date=date(2002,3,4))
 
     def testGridbasic(self):
         """Get a query from a GridModel
@@ -225,6 +228,23 @@ class GridTestCase(TestCase):
         raw_result, length = ag.get_rows(qry, fields=['name', 'title', 'birth_date', 'aprint'])
         self.assertEqual(expct_data, raw_result)
         self.assertEqual(length, 3)
+
+    def testGridComplex(self):
+        """test FK resolutions in ExtJSONEncoder
+        """
+        qry = Whatamess.objects.all()
+        import datetime
+        # Use method
+        expct_data = [
+            {u'name': u"dodo", u'author': u'toto'},
+            {u'name': u"dada", u'author': u'tata'},
+            {u'name': u"dudu", u'author': u'tutu'},
+        ]
+        wg = WhatamessGrid()
+        expct = {u"success": True, u"data": expct_data, u'results': 3}
+        jsonresult = wg.get_rows_json(qry, fields=['name', 'author'])
+        result = simplejson.loads(jsonresult)
+        self.assertEqual(expct, result)
 
     def testGridconfig(self):
         """ expct = {
