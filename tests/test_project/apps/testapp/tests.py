@@ -122,6 +122,19 @@ class FormsDataTestCase(TestCase):
         expct = {u"success": True, u"data": expct_data}
         self.assertEqual(expct, simplejson.loads(cf.as_extjsdata()))
 
+    def testModelFormbasic(self):
+        """Test a ModelForm
+        """
+        # With an instance
+        auth1 = Author.objects.create(name="toto", title="MR")
+        cf = AuthorForm(instance=auth1)
+        expct_data = {
+            u"name" : u'toto',
+            u"title" : u"MR",
+            }
+        expct = {u"success": True, u"data": expct_data}
+        self.assertEqual(expct, simplejson.loads(cf.as_extjsdata()))
+
 class GridTestCase(TestCase):
     def setUp(self):
         """

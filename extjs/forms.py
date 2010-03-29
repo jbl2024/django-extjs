@@ -5,6 +5,8 @@ CHAR_PIXEL_HEIGHT = 15
 
 import utils
 import simplejson
+from django.forms.forms import BoundField
+from django.forms import fields
 
 
 class ExtJsForm(object):
@@ -52,7 +54,25 @@ class ExtJsForm(object):
         """Give form data only
         """
         result = {}
-        if self.is_valid():
+        if not self.is_bound and isinstance(self, forms.ModelForm):
+            initial_data = {}
+            for name, field in self.fields.items():
+                bf = BoundField(self, field, name)
+                # TODO : factorise
+                if not bf.form.is_bound:
+                    data = bf.form.initial.get(bf.name, bf.field.initial)
+                    if callable(data):
+                        data = data()
+                    # temp hack for Checkbox
+                    if not data and isinstance(bf.field, fields.BooleanField):
+                        data = bf.data
+                else:
+                    data = bf.data
+                if data :
+                    initial_data[bf.name] = data
+            result["data"] = initial_data
+            result["success"] = True
+        elif self.is_valid():
             result["data"] = self.cleaned_data
             result["success"] = True
         else:
