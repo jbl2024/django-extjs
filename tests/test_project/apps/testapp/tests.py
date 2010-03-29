@@ -131,6 +131,7 @@ class FormsDataTestCase(TestCase):
         expct_data = {
             u"name" : u'toto',
             u"title" : u"MR",
+            u"birth_date" : None,
             }
         expct = {u"success": True, u"data": expct_data}
         self.assertEqual(expct, simplejson.loads(cf.as_extjsdata()))

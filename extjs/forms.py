@@ -68,8 +68,7 @@ class ExtJsForm(object):
                         data = bf.data
                 else:
                     data = bf.data
-                if data :
-                    initial_data[bf.name] = data
+                initial_data[bf.name] = data
             result["data"] = initial_data
             result["success"] = True
         elif self.is_valid():
