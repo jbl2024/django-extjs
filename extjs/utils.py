@@ -211,7 +211,7 @@ class ExtJSONEncoder(DjangoJSONEncoder):
                             config['hiddenName'] = v
                     elif ejs not in ('dataIndex', 'fieldLabel', 'header', 'defaultValue'):
                         if ejs == 'store':
-                            config[ejs] = [ [unicode(y), unicode(z)] for y, z in v]
+                            config[ejs] = [ [force_unicode(y), force_unicode(z)] for y, z in v]
                         else:
                             config[ejs] = v
 
@@ -221,7 +221,7 @@ class ExtJSONEncoder(DjangoJSONEncoder):
                         config[ext[0]] = v
             return config
         elif issubclass(o.__class__, models.Model):
-            return unicode(o)
+            return force_unicode(o)
         else:
             # Go up
             return super(ExtJSONEncoder, self).default(o)
