@@ -2,6 +2,7 @@ from django import forms
 import extjs
 
 from models import Author, Whatamess
+from django.utils.translation import ugettext_lazy as _
 
 class ContactForm(forms.Form):
     """ A simple Form"""
@@ -40,3 +41,8 @@ class AuthorxcludeForm(forms.ModelForm):
 
 extjs.register(AuthorxcludeForm)
 
+class I18nForm(forms.Form):
+    """ A simple Form"""
+    subject = forms.CharField(label=_('Subject'), max_length=100)
+
+extjs.register(I18nForm)
