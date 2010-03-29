@@ -13,8 +13,6 @@ import simplejson
 from django.utils.functional import Promise
 from django.utils.encoding import force_unicode
 
-
-
 class ExtJSONEncoder(DjangoJSONEncoder):
     """
     JSONEncoder subclass that knows how to encode django forms into ExtJS config objects.
@@ -127,6 +125,9 @@ class ExtJSONEncoder(DjangoJSONEncoder):
                 flds.append(cfg)
 
             return flds
+
+        if isinstance(o, Promise):
+            return force_unicode(o)
 
         # Serialize : Dict
         elif isinstance(o, dict):

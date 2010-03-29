@@ -29,4 +29,5 @@ def register(form, ):
     # Add tree methods for form instances
     setattr(form, 'as_extjsfields', ExtJsForm.as_extjsfields)
     setattr(form, 'as_extjs', ExtJsForm.as_extjs)
+    setattr(form, 'as_extjsdata', ExtJsForm.as_extjsdata)
     setattr(form, 'html_errorlist', ExtJsForm.html_errorlist)

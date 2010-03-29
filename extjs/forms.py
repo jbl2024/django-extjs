@@ -17,6 +17,7 @@ class ExtJsForm(object):
     def register(self, cls):
         cls.as_extjsfields = self.as_extjsfields
         cls.as_extjs = self.as_extjs
+        cls.as_extjsdata = self.as_extjsdata
         cls.html_errorlist = self.html_errorlist
         # default submit handler
         handler_submit = "function(btn) {console.log(this, btn);this.findParentByType(this.form_xtype).submitForm()}"
@@ -46,4 +47,16 @@ class ExtJsForm(object):
         """
         raise NotImplementedError("Not used")
 
-
+    @staticmethod
+    def as_extjsdata(self,):
+        """Give form data only
+        """
+        result = {}
+        if self.is_valid():
+            result["data"] = self.cleaned_data
+            result["success"] = True
+        else:
+            result["errors"] = self.errors
+            result["success"] = False
+        return simplejson.dumps(result, cls=utils.ExtJSONEncoder,
+                                ensure_ascii=False)

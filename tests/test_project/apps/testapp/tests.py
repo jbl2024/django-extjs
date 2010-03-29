@@ -101,6 +101,27 @@ class FormsTestCase(TestCase):
         self.assertEqual(expct, simplejson.loads(cf.as_extjs()))
 
 
+class FormsDataTestCase(TestCase):
+    """Tests to have form data
+    """
+    def testFormbasic(self):
+        """Test a simple Form datas
+        """
+        # With error
+        cf = ContactForm({'subject':'PONY', 'message': 'test', 'cc_myself': False})
+        expct = {u'errors': {u'sender': [u'This field is required.']}, u'success': False}
+        self.assertEqual(expct, simplejson.loads(cf.as_extjsdata()))
+        # Without error
+        expct_data = {
+            'subject': 'PONY',
+            'message': 'test',
+            'sender': 'pony@wonder.land',
+            'cc_myself': False,
+        }
+        cf = ContactForm({'subject':'PONY', 'message': 'test', 'sender': 'pony@wonder.land', 'cc_myself': False})
+        expct = {u"success": True, u"data": expct_data}
+        self.assertEqual(expct, simplejson.loads(cf.as_extjsdata()))
+
 class GridTestCase(TestCase):
     def setUp(self):
         """
