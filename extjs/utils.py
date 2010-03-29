@@ -189,7 +189,7 @@ class ExtJSONEncoder(DjangoJSONEncoder):
                 elif dj == 'label':
                     v = o.field.widget.attrs.get(dj, None)
                     if v is None:
-                        v = o.field.label
+                        v = getattr(o.field, 'label', None)
                         if v is None:
                             v = o.field.name
                         else:
