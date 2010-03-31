@@ -3,11 +3,12 @@ from django.test import TestCase
 from django.contrib.auth.models import User
 from django.utils import simplejson
 from django.conf import settings
+from django.http import HttpRequest, QueryDict
 
 from test_project.apps.testapp.forms import ContactForm, AuthorForm, AuthorxcludeForm, WhatamessForm, WhatamessFormFK, I18nForm
 from test_project.apps.testapp.models import Author, AuthorProxy, Whatamess
 from test_project.apps.testapp.models import AuthorGrid, AuthorGrid_nofields, AuthorGridProxy, WhatamessGrid
-
+from extjs.utils import query_from_request
 
 class FormsTestCase(TestCase):
     def testFormbasic(self):
@@ -325,3 +326,79 @@ class GridTestCase(TestCase):
         # Without jsonerror we get normal Django's exception
         self.assertRaises(AttributeError, ag.get_rows_json, qry, fields=['titl', 'birth_date', 'name'], jsonerror=False)
 
+class QueryFromRequestTest(TestCase):
+    """Test fonction query From request
+    """
+    def setUp(self):
+        """
+        """
+        self.auth0 = Author.objects.create(name="to", title="MR")
+        self.auth1 = Author.objects.create(name="tata", title="MR")
+        self.auth2 = Author.objects.create(name="tototo", title="MR")
+        self.auth3 = Author.objects.create(name="totototo", title="MR")
+        self.auth4 = Author.objects.create(name="tototototo", title="MR")
+        self.request = HttpRequest()
+
+    def test_query_filter(self):
+        """Test simples args
+        """
+        self.request = HttpRequest()
+        qr = Author.objects.all()
+        qrd = QueryDict('start=0&sort=id&dir=ASC&name=tata')
+        self.request.REQUEST = qrd
+        fields = (("name", "name"), ("desc", "description"),("id", "id"))
+        result_qr = query_from_request(self.request, qr, fields=fields)
+        self.assertEqual(list(result_qr), [self.auth1])
+
+    def test_query_limit(self):
+        """Test limit args
+        """
+        # test limit
+        self.request = HttpRequest()
+        qr = Author.objects.all()
+        qrd = QueryDict('sort=id&dir=ASC&limit=2')
+        self.request.REQUEST = qrd
+        fields = (("name", "name"), ("desc", "description"),("id", "id"))
+        result_qr = query_from_request(self.request, qr, fields=fields)
+        self.assertEqual(result_qr.count(), 2)
+
+        # test start only
+        qrd = QueryDict('start=2&sort=id&dir=ASC')
+        self.request.REQUEST = qrd
+        result_qr = query_from_request(self.request, qr, fields=fields)
+        self.assertTrue(self.auth1 not in result_qr)
+        self.assertEqual(result_qr.count(), 3)
+
+        # test start & limit
+        qrd = QueryDict('start=2&sort=id&dir=ASC&limit=2')
+        self.request.REQUEST = qrd
+        result_qr = query_from_request(self.request, qr, fields=fields)
+        self.assertTrue(self.auth1 not in result_qr)
+        self.assertEqual(result_qr.count(), 2)
+
+        # test exception
+        qrd = QueryDict('start=2&sort=id&dir=ASC&limit=abc')
+        self.request.REQUEST = qrd
+        result_qr = query_from_request(self.request, qr, fields=fields)
+        self.assertEqual(result_qr.count(), 0)
+
+        # test high limit
+        qrd = QueryDict('start=4&sort=id&dir=ASC&limit=20')
+        self.request.REQUEST = qrd
+        result_qr = query_from_request(self.request, qr, fields=fields)
+        self.assertEqual(result_qr.count(), 1)
+
+        # test high start
+        qrd = QueryDict('start=24&sort=id&dir=ASC&limit=20')
+        self.request.REQUEST = qrd
+        result_qr = query_from_request(self.request, qr, fields=fields)
+        self.assertEqual(result_qr.count(), 0)
+
+    def test_query_filter_unknowsort(self):
+        """Test unknowsort arg
+        """
+        qr = Author.objects.all()
+        qrd = QueryDict('start=0&sort=id&dir=ASC&group_id=1&name=test')
+        self.request.REQUEST = qrd
+        fields = (("name", "name"), ("desc", "description"))
+        self.assertRaises(IndexError, query_from_request, self.request, qr, fields=fields)

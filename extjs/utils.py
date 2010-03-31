@@ -230,6 +230,70 @@ class ExtJSONEncoder(DjangoJSONEncoder):
             # Go up
             return super(ExtJSONEncoder, self).default(o)
 
+def query_from_request(request, queryset, fields):
+    """Modify a queryset with request args
+
+    Params :
+     - request
+     - queryset : queryset to modify
+     - fields : list of 2 tuples with query <=> django field associations
+
+    For example request with::
+
+        name=toto&sort=id
+
+    With fields::
+
+        fields = (("name", "group__name"), ("id", "id"))
+
+    Is equivalent to::
+
+        queryset.filter(group__name__icontains="toto").order_by(['id'])
+
+    queryset can be limited with start= & limit=
+
+    """
+    # Filter time
+    for extfield, djfield in fields:
+        if extfield in request.REQUEST:
+            value = request.REQUEST.get(extfield)
+            filter_args = {'%s__icontains' % djfield : value}
+            queryset = queryset.filter(**filter_args)
+
+    # Sort time
+    if 'sort' in request.REQUEST:
+        sort = request.REQUEST.get('sort')
+        extfields = [ ext for ext, dj in fields ]
+        if sort not in extfields:
+            raise IndexError("Sort criter not listed in fields")
+
+        if 'dir' in request.REQUEST:
+            direction = request.REQUEST.get('dir')
+            if direction == 'DESC':
+                sort = '-%s' % (sort)
+        queryset = queryset.order_by(sort)
+
+    # get start time
+    start = request.REQUEST.get("start", 0)
+    try:
+        start = int(start)
+    except ValueError:
+        # Silent error because of user
+        return queryset.none()
+
+    # limit time
+    if 'limit' in request.REQUEST:
+        limit = request.REQUEST.get('limit')
+        try:
+            limit = int(limit)
+        except ValueError:
+            # Silent error because of user
+            return queryset.none()
+        queryset = queryset[start:start+limit]
+    elif start:
+        queryset = queryset[start:]
+
+    return queryset
 
 class ExtJSONSerializer(JSONSerializer):
     """Convert a queryset into

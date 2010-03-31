@@ -79,6 +79,19 @@ There is a full working demo project based on my django-skeleton here : [ExtJs d
             return utils.JsonResponse(form.as_extjs())
             
 
+**query_from_request example :**
+
+    # request with start=2&limit=10&sort=id&dir=ASC&name=toto
+
+    from extjs.utils import query_from_request
+    fields = (("name", "group__name"), ("id", "id"))
+    queryset = MyModel.objects.all()
+    query_from_request(request, queryset, fields)
+
+    Is equivalent to::
+
+        queryset.filter(group__name__icontains="toto").order_by(['id'])[2:12]
+
 **The lib provides :**
 
   - Django code to render your forms as extjs
