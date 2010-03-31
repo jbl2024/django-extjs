@@ -147,6 +147,36 @@ class FormsDataTestCase(TestCase):
         expct = {u"success": True, u"data": expct_data}
         self.assertEqual(expct, simplejson.loads(cf.as_extjsdata()))
 
+    def testFormComplex(self):
+        """Test a simple Form datas
+        """
+        # Without error
+        from datetime import date
+        auth1 = Author.objects.create(name="toto", title="ToTo", birth_date=date(2000,1,2))
+        data = {
+            'name':'PONY',
+            'number': 1,
+            'slug': 'slug',
+            'text': 'test',
+            'author' : 1,
+            'title': 1,
+            'yesno':True
+        }
+        cf = WhatamessForm(data)
+        expct_data = {
+            'name':'PONY',
+            'number': 1,
+            'slug': 'slug',
+            'text': 'test',
+            'author': "toto",
+            'title': 1,
+            'yesno': True,
+            'birth_date': None
+        }
+        expct_data["author"] = "toto"
+        expct = {u"success": True, u"data": expct_data}
+        self.assertEqual(expct, simplejson.loads(cf.as_extjsdata()))
+
 class GridTestCase(TestCase):
     def setUp(self):
         """
