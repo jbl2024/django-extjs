@@ -445,3 +445,13 @@ class QueryFromRequestTest(TestCase):
         self.assertEqual(result_qr.count(), 5)
         self.assertEqual(result_qr[0], self.auth4)
 
+    def test_query_filter_on_model(self):
+        """Test simples args
+        """
+        self.request = HttpRequest()
+        qr = Author.objects.all()
+        qrd = QueryDict('start=0&dir=ASC&name=tata')
+        self.request.REQUEST = qrd
+        ag = AuthorGrid()
+        result_qr = ag.query_from_request(self.request, qr)
+        self.assertEqual(list(result_qr), [self.auth1])

@@ -111,10 +111,13 @@ class ModelGrid(object):
 
             self.columns[field] = fdict
 
-    def query_from_request(request, queryset):
+    def query_from_request(self, request, queryset):
         """Wrap for query_from_request
         """
-        return utils.query_from_request(request, queryset, self.fields)
+        dfields = {}
+        for x in self.fields:
+            dfields[x] = self.mapping[x]
+        return utils.query_from_request(request, queryset, dfields)
 
     def get_rows(self, queryset, start=0, limit=0, fields=None, *args, **kwargs):
         """
