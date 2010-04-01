@@ -366,7 +366,7 @@ class QueryFromRequestTest(TestCase):
         self.auth1 = Author.objects.create(name="tata", title="MR")
         self.auth2 = Author.objects.create(name="tototo", title="MR")
         self.auth3 = Author.objects.create(name="totototo", title="MR")
-        self.auth4 = Author.objects.create(name="tototototo", title="MR")
+        self.auth4 = Author.objects.create(name="dototototo", title="MR")
         self.request = HttpRequest()
 
     def test_query_filter(self):
@@ -374,9 +374,9 @@ class QueryFromRequestTest(TestCase):
         """
         self.request = HttpRequest()
         qr = Author.objects.all()
-        qrd = QueryDict('start=0&sort=id&dir=ASC&name=tata')
+        qrd = QueryDict('start=0&dir=ASC&name=tata')
         self.request.REQUEST = qrd
-        fields = (("name", "name"), ("desc", "description"),("id", "id"))
+        fields = {"name": "name", "desc": "description", "id": "id"}
         result_qr = query_from_request(self.request, qr, fields=fields)
         self.assertEqual(list(result_qr), [self.auth1])
 
@@ -388,7 +388,7 @@ class QueryFromRequestTest(TestCase):
         qr = Author.objects.all()
         qrd = QueryDict('sort=id&dir=ASC&limit=2')
         self.request.REQUEST = qrd
-        fields = (("name", "name"), ("desc", "description"),("id", "id"))
+        fields = {"name": "name", "desc": "description", "id": "id"}
         result_qr = query_from_request(self.request, qr, fields=fields)
         self.assertEqual(result_qr.count(), 2)
 
@@ -430,5 +430,18 @@ class QueryFromRequestTest(TestCase):
         qr = Author.objects.all()
         qrd = QueryDict('start=0&sort=id&dir=ASC&group_id=1&name=test')
         self.request.REQUEST = qrd
-        fields = (("name", "name"), ("desc", "description"))
+        fields = {"name": "name", "desc": "description"}
         self.assertRaises(IndexError, query_from_request, self.request, qr, fields=fields)
+
+    def test_query_order(self):
+        """Test order
+        """
+        self.request = HttpRequest()
+        qr = Author.objects.all()
+        qrd = QueryDict('sort=dame&dir=ASC')
+        self.request.REQUEST = qrd
+        fields = {"dame": "name", "desc": "description", "pk": "id"}
+        result_qr = query_from_request(self.request, qr, fields=fields)
+        self.assertEqual(result_qr.count(), 5)
+        self.assertEqual(result_qr[0], self.auth4)
+

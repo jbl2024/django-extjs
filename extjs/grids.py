@@ -32,11 +32,12 @@ class VirtualField(object):
         self.name = name
 
 class ModelGrid(object):
+    mapping = None
     fields = None
     #exclude = None
     model = None
 
-    def __init__(self, model=None, exclude=None, fields=None):
+    def __init__(self, model=None, exclude=None, mapping=None, fields=None):
         """ Initialize the grid with params given on ModelGrid Definition or
         __init__
         """
@@ -47,6 +48,7 @@ class ModelGrid(object):
         else:
             self.model = model      # the model to use as reference
 
+
         # Excludes and Includes
         #exclude = exclude or self.exclude
 
@@ -56,8 +58,9 @@ class ModelGrid(object):
         base_fields = model_fields
 
         # Model base fields and needed fields
-        self.mfields = [ f.name for f in model_fields ]
-        self.fields = fields or self.fields or self.mfields
+        self.mfields = [ (f.name, f.name) for f in model_fields ]
+        self.mapping = mapping or self.mapping or dict(self.mfields)
+        self.fields = fields or self.fields or dict(self.mfields).keys()
 
         # Get good field config for fields
         for field in base_fields:
@@ -108,6 +111,11 @@ class ModelGrid(object):
 
             self.columns[field] = fdict
 
+    def query_from_request(request, queryset):
+        """Wrap for query_from_request
+        """
+        return utils.query_from_request(request, queryset, self.fields)
+
     def get_rows(self, queryset, start=0, limit=0, fields=None, *args, **kwargs):
         """
             return list from given queryset
@@ -152,8 +160,7 @@ class ModelGrid(object):
     def to_store(self, fields=None, url=None, *args, **kwargs):
         """Create DataStore for this grid
         """
-        if not fields:
-            fields = self.fields
+        fields = fields or self.fields
 
         field_list = []
         for field in fields:

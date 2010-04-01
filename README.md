@@ -84,7 +84,7 @@ There is a full working demo project based on my django-skeleton here : [ExtJs d
     # request with start=2&limit=10&sort=id&dir=ASC&name=toto
 
     from extjs.utils import query_from_request
-    fields = (("name", "group__name"), ("id", "id"))
+    fields = {"name": "group__name", "id": "id"}
     queryset = MyModel.objects.all()
     query_from_request(request, queryset, fields)
 

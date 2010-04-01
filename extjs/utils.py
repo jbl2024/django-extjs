@@ -236,7 +236,7 @@ def query_from_request(request, queryset, fields):
     Params :
      - request
      - queryset : queryset to modify
-     - fields : list of 2 tuples with query <=> django field associations
+     - fields : dict with query <=> django field associations
 
     For example request with::
 
@@ -244,7 +244,7 @@ def query_from_request(request, queryset, fields):
 
     With fields::
 
-        fields = (("name", "group__name"), ("id", "id"))
+        fields = {"name": "group__name", "id": "id"}
 
     Is equivalent to::
 
@@ -254,7 +254,7 @@ def query_from_request(request, queryset, fields):
 
     """
     # Filter time
-    for extfield, djfield in fields:
+    for extfield, djfield in fields.items():
         if extfield in request.REQUEST:
             value = request.REQUEST.get(extfield)
             filter_args = {'%s__icontains' % djfield : value}
@@ -263,15 +263,14 @@ def query_from_request(request, queryset, fields):
     # Sort time
     if 'sort' in request.REQUEST:
         sort = request.REQUEST.get('sort')
-        extfields = [ ext for ext, dj in fields ]
-        if sort not in extfields:
+        if sort not in fields.keys():
             raise IndexError("Sort criter not listed in fields")
 
         if 'dir' in request.REQUEST:
             direction = request.REQUEST.get('dir')
             if direction == 'DESC':
                 sort = '-%s' % (sort)
-        queryset = queryset.order_by(sort)
+        queryset = queryset.order_by(fields[sort])
 
     # get start time
     start = request.REQUEST.get("start", 0)
