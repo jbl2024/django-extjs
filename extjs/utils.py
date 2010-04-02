@@ -265,12 +265,13 @@ def query_from_request(request, queryset, fields):
         sort = request.REQUEST.get('sort')
         if sort not in fields.keys():
             raise IndexError("Sort criter not listed in fields")
+        dj_sort = fields[sort]
 
         if 'dir' in request.REQUEST:
             direction = request.REQUEST.get('dir')
             if direction == 'DESC':
-                sort = '-%s' % (sort)
-        queryset = queryset.order_by(fields[sort])
+                dj_sort = '-%s' % (dj_sort)
+        queryset = queryset.order_by(dj_sort)
 
     # get start time
     start = request.REQUEST.get("start", 0)

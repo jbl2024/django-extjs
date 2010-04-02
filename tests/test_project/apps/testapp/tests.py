@@ -445,6 +445,18 @@ class QueryFromRequestTest(TestCase):
         self.assertEqual(result_qr.count(), 5)
         self.assertEqual(result_qr[0], self.auth4)
 
+    def test_query_order_reverse(self):
+        """Test order DESC
+        """
+        self.request = HttpRequest()
+        qr = Author.objects.all()
+        qrd = QueryDict('sort=dame&dir=DESC')
+        self.request.REQUEST = qrd
+        fields = {"dame": "name", "desc": "description", "pk": "id"}
+        result_qr = query_from_request(self.request, qr, fields=fields)
+        self.assertEqual(result_qr.count(), 5)
+        self.assertEqual(result_qr[4], self.auth4)
+
     def test_query_filter_on_model(self):
         """Test simples args
         """
