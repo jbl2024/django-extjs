@@ -35,9 +35,16 @@ class ModelGrid(object):
     """From a `mapping` of extjs_names <=> django_field_names
     and `fields` order, give somes handfull methods to use with ExtJS
     """
-    mapping = None
+    # Final mapping is mapping + dict(list_mapping)
+    mapping = {}
+    list_mapping = []
+
+    # Fields describe order of field.
+    # if no order is given order is list_mapping + mapping keys 
     fields = None
     #exclude = None
+
+
     model = None
 
     def __init__(self, model=None, exclude=None, mapping=None, fields=None):
@@ -64,6 +71,10 @@ class ModelGrid(object):
         self.mfields = [ (f.name, f.name) for f in model_fields ]
         self.mapping = mapping or self.mapping or dict(self.mfields)
         self.fields = fields or self.fields or dict(self.mfields).keys()
+
+        from copy import copy
+        self._mapping = copy(self.mapping)
+        self._mapping.update((x, x) for x in self.list_mapping)
 
         # Get good field config for fields
         for field in base_fields:
@@ -112,7 +123,7 @@ class ModelGrid(object):
         """
         dfields = {}
         for x in self.fields:
-            dfields[x] = self.mapping[x]
+            dfields[x] = self._mapping[x]
         return utils.query_from_request(request, queryset, dfields)
 
     def get_rows(self, queryset, start=0, limit=0, fields=None, *args, **kwargs):
@@ -125,7 +136,7 @@ class ModelGrid(object):
             fields = self.fields
 
         for f in fields:
-            if f not in self.mapping.keys():
+            if f not in self._mapping.keys():
                 raise AttributeError("No mapped field '%s'" % (f))
 
         if limit > 0:
@@ -136,7 +147,7 @@ class ModelGrid(object):
         for obj in queryset:
             row = {}
             for field in fields:
-                row[field] = getattr(obj, self.mapping[field])
+                row[field] = getattr(obj, self._mapping[field])
             data.append(row)
 
         return data, len(data)
@@ -169,7 +180,7 @@ class ModelGrid(object):
         rmap = dict((v, k) for k, v in self.mapping.items())
         for field in fields:
             for f in self.columns.values():
-                if f['name'] == self.mapping[field]:
+                if f['name'] == self._mapping[field]:
                     field_list.append(f)
         result = {'fields': field_list}
         if url:

@@ -281,13 +281,15 @@ class GridTestCase(TestCase):
 
     def testGridProxy(self):
         """Get a query from a GridModel with proxy and customs methods
+        
+        Test `fields`
         """
         qry = AuthorProxy.objects.all()
         import datetime
         expct_data = [
-            {'id': 1, 'name': u"toto", 'title': u"ToTo", 'birth_date': datetime.date(2000, 1, 2)},
-            {'id': 2, 'name': u"tata", 'title': u"TaTa", 'birth_date': datetime.date(2001, 2, 3)},
-            {'id': 3, 'name': u"tutu", 'title': u"TuTu", 'birth_date': datetime.date(2002, 3, 4)},
+            {'uid': 1, 'name': u"toto", 'title': u"ToTo", 'birth_date': datetime.date(2000, 1, 2)},
+            {'uid': 2, 'name': u"tata", 'title': u"TaTa", 'birth_date': datetime.date(2001, 2, 3)},
+            {'uid': 3, 'name': u"tutu", 'title': u"TuTu", 'birth_date': datetime.date(2002, 3, 4)},
         ]
         ag = AuthorGridProxy()
         raw_result, length = ag.get_rows(qry,)
