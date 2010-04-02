@@ -148,7 +148,15 @@ class ModelGrid(object):
         for obj in queryset:
             row = {}
             for field in fields:
-                row[field] = getattr(obj, self._mapping[field])
+                if "__" in self._mapping[field]:
+                    # Handle ForeignKeys
+                    from copy import copy
+                    fk_obj = copy(obj)
+                    for relation in self._mapping[field].split("__"):
+                        fk_obj = getattr(fk_obj, relation)
+                    row[field] = fk_obj
+                else:
+                    row[field] = getattr(obj, self._mapping[field])
             data.append(row)
 
         return data, len(data)

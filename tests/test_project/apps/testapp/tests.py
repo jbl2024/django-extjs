@@ -320,8 +320,23 @@ class GridTestCase(TestCase):
         ]
         wg = WhatamessGrid()
         expct = {u"success": True, u"data": expct_data, u'results': 3}
-        jsonresult = wg.get_rows_json(qry, fields=['name', 'author'])
+        jsonresult = wg.get_rows_json(qry)
         result = simplejson.loads(jsonresult)
+        self.assertEqual(expct, result)
+
+    def testGridComplexFK(self):
+        """test FK resolutions in ExtJSONEncoder
+        """
+        # test FK
+        qry = Whatamess.objects.all()
+        wg = WhatamessGrid()
+        expct_data = [
+            {'atitle': 'ToTo'},
+            {'atitle': 'TaTa'},
+            {'atitle': 'TuTu'},
+        ]
+        expct = (expct_data, 3)
+        result = wg.get_rows(qry, fields=['atitle',])
         self.assertEqual(expct, result)
 
     def testGridconfig(self):

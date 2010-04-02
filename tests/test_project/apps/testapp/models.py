@@ -74,5 +74,9 @@ class AuthorGrid_nofields(grids.ModelGrid):
 
 class WhatamessGrid(grids.ModelGrid):
     model = Whatamess
-
+    list_mapping = ['name', 'author']
+    mapping = {
+        'atitle': "author__title",
+    }
+    fields = ['name', 'author']
 
