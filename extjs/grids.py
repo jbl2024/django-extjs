@@ -32,6 +32,9 @@ class VirtualField(object):
         self.name = name
 
 class ModelGrid(object):
+    """From a `mapping` of extjs_names <=> django_field_names
+    and `fields` order, give somes handfull methods to use with ExtJS
+    """
     mapping = None
     fields = None
     #exclude = None
@@ -64,13 +67,6 @@ class ModelGrid(object):
 
         # Get good field config for fields
         for field in base_fields:
-            # Excludes and includes
-            #if fields:
-            #    if field.name not in fields:
-            #        continue
-            #elif exclude:
-            #    if field.name in exclude:
-            #        continue
 
             # XXX VirtualField  : wtf ?
             if field.__class__.__name__ == VirtualField:
@@ -128,6 +124,10 @@ class ModelGrid(object):
         if not fields:
             fields = self.fields
 
+        for f in fields:
+            if f not in self.mapping.keys():
+                raise AttributeError("No mapped field '%s'" % (f))
+
         if limit > 0:
             queryset = queryset[int(start):int(start) + int(limit)]
 
@@ -136,7 +136,7 @@ class ModelGrid(object):
         for obj in queryset:
             row = {}
             for field in fields:
-                row[field] = getattr(obj, field)
+                row[field] = getattr(obj, self.mapping[field])
             data.append(row)
 
         return data, len(data)
@@ -166,9 +166,10 @@ class ModelGrid(object):
         fields = fields or self.fields
 
         field_list = []
+        rmap = dict((v, k) for k, v in self.mapping.items())
         for field in fields:
             for f in self.columns.values():
-                if f['name'] == field:
+                if f['name'] == self.mapping[field]:
                     field_list.append(f)
         result = {'fields': field_list}
         if url:

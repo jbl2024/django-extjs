@@ -50,11 +50,13 @@ from extjs import grids
 
 class AuthorGrid(grids.ModelGrid):
     model = Author
-    mapping = {'name': 'name', 'title': 'title', 'birth_date': 'birth_date'}
-    fields = ['name', 'title', 'birth_date']
+    mapping = {'his_name': 'name', 'title': 'title', 'birth_date': 'birth_date'}
+    fields = ['his_name', 'title', 'birth_date']
 
 class AuthorGridProxy(grids.ModelGrid):
     model = AuthorProxy
+    mapping = {'id': 'id', 'name': 'name', 'title': 'title', 'birth_date': 'birth_date', 'aprint': 'aprint'}
+    fields = ['id', 'name', 'title', 'birth_date']
 
 class AuthorGrid_nofields(grids.ModelGrid):
     model = Author

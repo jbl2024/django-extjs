@@ -25,7 +25,8 @@ There is a full working demo project based on my django-skeleton here : [ExtJs d
     from extjs import grids
     class AuthorGrid(grids.ModelGrid):
         model = Author
-        fields = ['name', 'title', 'birth_date']
+        mapping = {'his_name': 'name', 'title': 'title', 'birth_date': 'birth_date'}
+        fields = ['his_name', 'title', 'birth_date']
 
     # the django view
     from extjs import utils

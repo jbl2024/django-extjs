@@ -195,9 +195,9 @@ class GridTestCase(TestCase):
         qry = Author.objects.all()
         import datetime
         expct_data = [
-            {'name': u"toto", 'title': u"ToTo", 'birth_date': datetime.date(2000, 1, 2)},
-            {'name': u"tata", 'title': u"TaTa", 'birth_date': datetime.date(2001, 2, 3)},
-            {'name': u"tutu", 'title': u"TuTu", 'birth_date': datetime.date(2002, 3, 4)},
+            {'his_name': u"toto", 'title': u"ToTo", 'birth_date': datetime.date(2000, 1, 2)},
+            {'his_name': u"tata", 'title': u"TaTa", 'birth_date': datetime.date(2001, 2, 3)},
+            {'his_name': u"tutu", 'title': u"TuTu", 'birth_date': datetime.date(2002, 3, 4)},
         ]
         ag = AuthorGrid()
         raw_result, length = ag.get_rows(qry,)
@@ -206,12 +206,12 @@ class GridTestCase(TestCase):
 
         # And now get result in JSONResponse
         expct_data = [
-            {'title': u"ToTo", 'birth_date': u"2000-01-02", 'name': u"toto"},
-            {'title': u"TaTa", 'birth_date': u"2001-02-03", 'name': u"tata"},
-            {'title': u"TuTu", 'birth_date': u"2002-03-04", 'name': u"tutu"},
+            {'title': u"ToTo", 'birth_date': u"2000-01-02", 'his_name': u"toto"},
+            {'title': u"TaTa", 'birth_date': u"2001-02-03", 'his_name': u"tata"},
+            {'title': u"TuTu", 'birth_date': u"2002-03-04", 'his_name': u"tutu"},
         ]
         expct = {u"success": True, u"data": expct_data, u'results': 3}
-        jsonresult = ag.get_rows_json(qry, fields=['title', 'birth_date', 'name'])
+        jsonresult = ag.get_rows_json(qry, fields=['title', 'birth_date', 'his_name'])
         result = simplejson.loads(jsonresult)
         self.assertEqual(expct, result)
 
@@ -219,9 +219,9 @@ class GridTestCase(TestCase):
         response = self.client.get("/api/author/getjson")
         result = simplejson.loads(response.content)
         expct_data = [
-            {'name': "toto", 'title': "ToTo", 'birth_date': "2000-01-02"},
-            {'name': "tata", 'title': "TaTa", 'birth_date': "2001-02-03"},
-            {'name': "tutu", 'title': "TuTu", 'birth_date': "2002-03-04"},
+            {'his_name': "toto", 'title': "ToTo", 'birth_date': "2000-01-02"},
+            {'his_name': "tata", 'title': "TaTa", 'birth_date': "2001-02-03"},
+            {'his_name': "tutu", 'title': "TuTu", 'birth_date': "2002-03-04"},
         ]
         expct = {"success": True, "data": expct_data, 'results': 3}
         self.assertEqual(expct, result)
@@ -251,14 +251,14 @@ class GridTestCase(TestCase):
 
         # And now get result in JSONResponse
         expct_data = [
-            {'title': u"ToTo", 'birth_date': u"2000-01-02", 'name': u"toto"},
-            {'title': u"TaTa", 'birth_date': u"2001-02-03", 'name': u"tata"},
-            {'title': u"TuTu", 'birth_date': u"2002-03-04", 'name': u"tutu"},
-            {'title': u"TéTé", 'birth_date': u"2000-01-02", 'name': u"tété"},
+            {'title': u"ToTo", 'birth_date': u"2000-01-02", 'his_name': u"toto"},
+            {'title': u"TaTa", 'birth_date': u"2001-02-03", 'his_name': u"tata"},
+            {'title': u"TuTu", 'birth_date': u"2002-03-04", 'his_name': u"tutu"},
+            {'title': u"TéTé", 'birth_date': u"2000-01-02", 'his_name': u"tété"},
         ]
         ag = AuthorGrid()
         expct = {u"success": True, u"data": expct_data, u'results': 4}
-        jsonresult = ag.get_rows_json(qry, fields=['title', 'birth_date', 'name'])
+        jsonresult = ag.get_rows_json(qry, fields=['title', 'birth_date', 'his_name'])
         result = simplejson.loads(jsonresult)
         self.assertEqual(expct, result)
 
@@ -349,7 +349,7 @@ class GridTestCase(TestCase):
             {'title': u"TaTa", 'birth_date': u"2001-02-03", 'name': u"tata"},
             {'title': u"TuTu", 'birth_date': u"2002-03-04", 'name': u"tutu"},
         ]
-        expct = {u"success": False, u"message": "Error : 'Author' object has no attribute 'titl'"}
+        expct = {u"success": False, u"message": "Error : No mapped field 'titl'"}
         jsonresult = ag.get_rows_json(qry, fields=['titl', 'birth_date', 'name'])
         result = simplejson.loads(jsonresult)
         self.assertEqual(expct, result)
@@ -450,7 +450,7 @@ class QueryFromRequestTest(TestCase):
         """
         self.request = HttpRequest()
         qr = Author.objects.all()
-        qrd = QueryDict('start=0&dir=ASC&name=tata')
+        qrd = QueryDict('start=0&dir=ASC&his_name=tata')
         self.request.REQUEST = qrd
         ag = AuthorGrid()
         result_qr = ag.query_from_request(self.request, qr)
