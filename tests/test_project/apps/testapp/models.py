@@ -50,8 +50,17 @@ from extjs import grids
 
 class AuthorGrid(grids.ModelGrid):
     model = Author
+    list_mapping = ['title', 'birth_date',]
+    mapping = {'his_name': 'name'}
+
+class AuthorGrid_idsort(grids.ModelGrid):
+    """In this grid we want to sort by id but we don't
+    want to show id column by default
+    """
+    model = Author
     list_mapping = ['id', 'title', 'birth_date',]
     mapping = {'his_name': 'name'}
+
     fields = ['his_name', 'title', 'birth_date']
 
 class AuthorGridProxy(grids.ModelGrid):

@@ -7,8 +7,6 @@ Convert your forms.Form and forms.ModelForm to extjs and handles the form submis
 
 Generate custom ExtJs dynamic grids from django querysets. You can also set your grids as Editable.
 
-There is a full working demo project based on my django-skeleton here : [ExtJs django-skeleton branch][8] this is where you should start.
-
 **Grid example :**
     
     # django models 
@@ -25,8 +23,8 @@ There is a full working demo project based on my django-skeleton here : [ExtJs d
     from extjs import grids
     class AuthorGrid(grids.ModelGrid):
         model = Author
-        mapping = {'his_name': 'name', 'title': 'title', 'birth_date': 'birth_date'}
-        fields = ['his_name', 'title', 'birth_date']
+        list_mapping = ['title', 'birth_date']
+        mapping = {'his_name': 'name'}
 
     # the django view
     from extjs import utils
@@ -35,6 +33,7 @@ There is a full working demo project based on my django-skeleton here : [ExtJs d
         grid = AuthorGrid()            # generic grid from model fields
         authors = Author.objects.all()     # use any queryset
         jsonrows = grid.get_rows_json(authors)
+        # got `his_name` `title` and `birth_date` fields
         return utils.JsonResponse(jsonrows)
 
 **Form example :**

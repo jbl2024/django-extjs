@@ -7,7 +7,7 @@ from django.http import HttpRequest, QueryDict
 
 from test_project.apps.testapp.forms import ContactForm, AuthorForm, AuthorxcludeForm, WhatamessForm, WhatamessFormFK, I18nForm
 from test_project.apps.testapp.models import Author, AuthorProxy, Whatamess
-from test_project.apps.testapp.models import AuthorGrid, AuthorGrid_nofields, AuthorGridProxy, WhatamessGrid
+from test_project.apps.testapp.models import AuthorGrid, AuthorGrid_idsort, AuthorGrid_nofields, AuthorGridProxy, WhatamessGrid
 from extjs.utils import query_from_request
 
 class FormsTestCase(TestCase):
@@ -267,9 +267,9 @@ class GridTestCase(TestCase):
         """
         #expct = {'store': store,
         columns = [
+            {'name': 'birth_date', 'dateFormat': 'Y-m-d', 'format': 'Y-m-d', 'tooltip': u'birth date', 'header': 'birth_date', 'type': 'date','xtype': 'datecolumn'},
             {'header': 'name', 'name': 'name', 'tooltip': u'Name'},
             {'header': 'title', 'name': 'title', 'tooltip': u'title'},
-            {'name': 'birth_date', 'dateFormat': 'Y-m-d', 'format': 'Y-m-d', 'tooltip': u'birth date', 'header': 'birth_date', 'type': 'date','xtype': 'datecolumn'}
         ]
         ag = AuthorGrid()
         store = ag.to_store()
@@ -466,6 +466,6 @@ class QueryFromRequestTest(TestCase):
         qr = Author.objects.all()
         qrd = QueryDict('start=0&dir=ASC&his_name=tata')
         self.request.REQUEST = qrd
-        ag = AuthorGrid()
+        ag = AuthorGrid_idsort()
         result_qr = ag.query_from_request(self.request, qr)
         self.assertEqual(list(result_qr), [self.auth1])

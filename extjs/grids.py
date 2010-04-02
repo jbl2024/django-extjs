@@ -39,8 +39,7 @@ class ModelGrid(object):
     mapping = {}
     list_mapping = []
 
-    # Fields describe order of field.
-    # if no order is given order is list_mapping + mapping keys 
+    # Fields describe default subset of fields from final mapping.
     fields = None
     #exclude = None
 
@@ -70,11 +69,13 @@ class ModelGrid(object):
         # Model base fields and needed fields
         self.mfields = [ (f.name, f.name) for f in model_fields ]
         self.mapping = mapping or self.mapping or dict(self.mfields)
-        self.fields = fields or self.fields or dict(self.mfields).keys()
 
+        # Assemble _mapping (final_mapping)
         from copy import copy
         self._mapping = copy(self.mapping)
         self._mapping.update((x, x) for x in self.list_mapping)
+
+        self.fields = fields or self.fields or self._mapping.keys()
 
         # Get good field config for fields
         for field in base_fields:
