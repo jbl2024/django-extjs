@@ -5,6 +5,8 @@ from django.utils import simplejson
 from django.conf import settings
 from django.http import HttpRequest, QueryDict
 
+from datetime import date
+
 from test_project.apps.testapp.forms import ContactForm, AuthorForm, AuthorxcludeForm, WhatamessForm, WhatamessFormFK, I18nForm
 from test_project.apps.testapp.models import Author, AuthorProxy, Whatamess
 from test_project.apps.testapp.models import AuthorGrid, AuthorGrid_idsort, AuthorGrid_nofields, AuthorGridProxy, WhatamessGrid
@@ -181,7 +183,6 @@ class GridTestCase(TestCase):
     def setUp(self):
         """
         """
-        from datetime import date
         self.auth1 = Author.objects.create(name="toto", title="ToTo", birth_date=date(2000,1,2))
         self.auth2 = Author.objects.create(name="tata", title="TaTa", birth_date=date(2001,2,3))
         self.auth3 = Author.objects.create(name="tutu", title="TuTu", birth_date=date(2002,3,4))
@@ -383,7 +384,7 @@ class QueryFromRequestTest(TestCase):
         self.auth1 = Author.objects.create(name="tata", title="MR")
         self.auth2 = Author.objects.create(name="tototo", title="MR")
         self.auth3 = Author.objects.create(name="totototo", title="MR")
-        self.auth4 = Author.objects.create(name="dototototo", title="MR")
+        self.auth4 = Author.objects.create(name="dototototo", title="DR")
         self.request = HttpRequest()
 
     def test_query_filter(self):
@@ -484,3 +485,31 @@ class QueryFromRequestTest(TestCase):
         ag = AuthorGrid_idsort()
         result_qr = ag.query_from_request(self.request, qr)
         self.assertEqual(list(result_qr), [self.auth1])
+
+    def test_query_sort_on_model_with_fk(self):
+        """
+        """
+        wam1 = Whatamess.objects.create(name="dodo", title=1, number=1, text="d o d o", author=self.auth1, yesno=True, birth_date=date(2000,1,2))
+        wam2 = Whatamess.objects.create(name="dada", title=1, number=2, text="d a d a", author=self.auth2, yesno=True, birth_date=date(2001,2,3))
+        wam3 = Whatamess.objects.create(name="dudu", title=1, number=3, text="d u d u", author=self.auth4, yesno=True, birth_date=date(2002,3,4))
+        self.request = HttpRequest()
+        qr = Whatamess.objects.all()
+        qrd = QueryDict('start=0&dir=ASC&sort=atitle')
+        self.request.REQUEST = qrd
+        wg = WhatamessGrid()
+        result_qr = wg.query_from_request(self.request, qr, fields=['atitle'])
+        self.assertEqual(result_qr[0], wam3)
+
+    def test_query_filter_on_model_with_fk(self):
+        """
+        """
+        wam1 = Whatamess.objects.create(name="dodo", title=1, number=1, text="d o d o", author=self.auth1, yesno=True, birth_date=date(2000,1,2))
+        wam2 = Whatamess.objects.create(name="dada", title=1, number=2, text="d a d a", author=self.auth2, yesno=True, birth_date=date(2001,2,3))
+        wam3 = Whatamess.objects.create(name="dudu", title=1, number=3, text="d u d u", author=self.auth4, yesno=True, birth_date=date(2002,3,4))
+        self.request = HttpRequest()
+        qr = Whatamess.objects.all()
+        qrd = QueryDict('start=0&dir=ASC&atitle=D')
+        self.request.REQUEST = qrd
+        wg = WhatamessGrid()
+        result_qr = wg.query_from_request(self.request, qr, fields=['atitle'])
+        self.assertEqual(list(result_qr), [wam3])
