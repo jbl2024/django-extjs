@@ -163,7 +163,7 @@ class ModelGrid(object):
 
         return data, len(data)
 
-    def get_rows_json(self, queryset, jsonerror=True, *args, **kwargs):
+    def get_rows_json(self, queryset, jsonerror=False, *args, **kwargs):
         """
             return json message from given queryset
             order the data based on given field list
