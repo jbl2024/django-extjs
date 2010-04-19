@@ -374,6 +374,23 @@ class GridTestCase(TestCase):
         # Without jsonerror we get normal Django's exception
         self.assertRaises(AttributeError, ag.get_rows_json, qry, fields=['titl', 'birth_date', 'name'])
 
+    def testGridComplexFKnull(self):
+        """test FK resolutions with FK null
+        """
+        # test FK
+        self.wam3 = Whatamess.objects.create(name="didi", title=1, number=4, text="d i d i", yesno=True, birth_date=date(2003,4,5))
+        qry = Whatamess.objects.all()
+        wg = WhatamessGrid()
+        expct_data = [
+            {'atitle': 'ToTo'},
+            {'atitle': 'TaTa'},
+            {'atitle': 'TuTu'},
+            {'atitle': None},
+        ]
+        expct = (expct_data, 4)
+        result = wg.get_rows(qry, fields=['atitle',])
+        self.assertEqual(expct, result)
+
 class QueryFromRequestTest(TestCase):
     """Test fonction query From request
     """

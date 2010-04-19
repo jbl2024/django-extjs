@@ -155,7 +155,12 @@ class ModelGrid(object):
                     from copy import copy
                     fk_obj = copy(obj)
                     for relation in self._mapping[field].split("__"):
-                        fk_obj = getattr(fk_obj, relation)
+                        # For FK with null=True, getattr will raise an AttributeError
+                        try:
+                            fk_obj = getattr(fk_obj, relation)
+                        except AttributeError:
+                            fk_obj = None
+                            break
                     row[field] = fk_obj
                 else:
                     row[field] = getattr(obj, self._mapping[field])

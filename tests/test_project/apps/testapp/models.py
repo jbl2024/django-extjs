@@ -24,7 +24,7 @@ class Whatamess(models.Model):
     number = models.IntegerField()
     slug = models.SlugField()
     text = models.TextField()
-    author = models.ForeignKey(Author)
+    author = models.ForeignKey(Author, null=True)
     title = models.PositiveSmallIntegerField(max_length=3, choices=TITLE_CHOICES)
     birth_date = models.DateTimeField(blank=True, null=True)
     yesno = models.BooleanField()
