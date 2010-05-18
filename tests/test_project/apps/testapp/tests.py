@@ -4,13 +4,15 @@ from django.contrib.auth.models import User
 from django.utils import simplejson
 from django.conf import settings
 from django.http import HttpRequest, QueryDict
+from django.core.urlresolvers import reverse
 
 from datetime import date
 
 from test_project.apps.testapp.forms import ContactForm, AuthorForm, AuthorxcludeForm, WhatamessForm, WhatamessFormFK, I18nForm
 from test_project.apps.testapp.models import Author, AuthorProxy, Whatamess
 from test_project.apps.testapp.models import AuthorGrid, AuthorGrid_idsort, AuthorGrid_nofields, AuthorGridProxy, WhatamessGrid
-from extjs.utils import query_from_request
+from extjs.utils import query_from_request, ExtJSONEncoder
+import simplejson
 
 class FormsTestCase(TestCase):
     def testFormbasic(self):
@@ -530,3 +532,30 @@ class QueryFromRequestTest(TestCase):
         wg = WhatamessGrid()
         result_qr = wg.query_from_request(self.request, qr, fields=['atitle'])
         self.assertEqual(list(result_qr), [wam3])
+
+class OtherTests(TestCase):
+    """Other tests
+    """
+    def setUp(self):
+        """
+        """
+        # user
+        user = User(email="extjs@extjs.tld", username="extjs")
+        user.set_password('extjs')
+        user.is_superuser = True
+        user.is_staff = False
+        user.save()
+        self.user = User.objects.get(email="extjs@extjs.tld")
+
+    def test_decorator(self):
+        """Test extjs_login_required
+        """
+        response = self.client.get(reverse('test_decorator'))
+        rsp = {"success" : False, 'errorMsg': 'not connected', 'notConnected': True}
+        result = simplejson.dumps(rsp, cls=ExtJSONEncoder)
+        self.assertTrue("Content-Type: text/javascript" in str(response))
+        self.assertTrue(result in response.content)
+        self.client.login(username="extjs", password="extjs")
+        response = self.client.get(reverse('test_decorator'))
+        self.assertTrue("I was here" in response.content)
+

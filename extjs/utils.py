@@ -13,6 +13,13 @@ import simplejson
 from django.utils.functional import Promise
 from django.utils.encoding import force_unicode
 
+from django.http import HttpResponseRedirect
+from django.utils.decorators import available_attrs
+try:
+    from functools import update_wrapper, wraps
+except ImportError:
+    from django.utils.functional import update_wrapper, wraps  # Python 2.4 fallback.
+
 class ExtJSONEncoder(DjangoJSONEncoder):
     """
     JSONEncoder subclass that knows how to encode django forms into ExtJS config objects.
@@ -322,3 +329,33 @@ def JsonResponse(content, *args, **kwargs):
 def JsonError(error = ''):
     result = {"success": False, "msg": error }
     return JsonResponse(simplejson.dumps(result, cls=ExtJSONEncoder))
+
+def user_passes_test(test_func, login_url=None):
+    """
+    Decorator for views that checks that the user passes the given test,
+    get an extjs error. The test should be a callable
+    that takes the user object and returns True if the user passes.
+    """
+    if not login_url:
+        from django.conf import settings
+        login_url = settings.LOGIN_URL
+
+    def decorator(view_func):
+        def _wrapped_view(request, *args, **kwargs):
+            if test_func(request.user):
+                return view_func(request, *args, **kwargs)
+            rsp = {"success" : False, 'errorMsg': 'not connected', 'notConnected': True}
+            result = simplejson.dumps(rsp, cls=ExtJSONEncoder)
+            return JsonResponse(result)
+        return wraps(view_func, assigned=available_attrs(view_func))(_wrapped_view)
+    return decorator
+
+def extjs_login_required(function=None):
+    """
+    Decorator for views that checks that the user is logged in.
+    """
+    actual_decorator = user_passes_test(lambda u: u.is_authenticated())
+    if function:
+        return actual_decorator(function)
+    return actual_decorator
+

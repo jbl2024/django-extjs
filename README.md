@@ -119,7 +119,7 @@ Generate custom ExtJs dynamic grids from django querysets. You can also set your
   - cd tests
   - python bootstrap.py
   - ./bin/buildout.py -v
-  - ./bin/test-1.1 or ./bin/test-1.0
+  - ./bin/test-1.2
 
   
   [1]: http://docs.djangoproject.com/en/dev/topics/forms/
