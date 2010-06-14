@@ -28,7 +28,7 @@ class ExtJSONEncoder(DjangoJSONEncoder):
     """
 
     CHECKBOX_EDITOR = {
-        'xtype': 'checkbox'
+        'xtype': 'checkbox',
     }
     COMBO_EDITOR = {
         'listWidth': 'auto',
@@ -182,6 +182,8 @@ class ExtJSONEncoder(DjangoJSONEncoder):
                     v = o.field.widget.attrs.get(dj, default_config.get('fieldHidden', ext[1]))
                 elif dj == 'name':
                     v = o.field.name
+                elif dj == 'required':
+                    v = not o.field.required
                 elif dj == 'value':
                     # Get value depends of source
                     # http://code.djangoproject.com/browser/django/trunk/django/forms/forms.py#L432
@@ -232,6 +234,7 @@ class ExtJSONEncoder(DjangoJSONEncoder):
                         config[ext[0]] = v.encode('utf8')
                     else:
                         config[ext[0]] = v
+
             return config
         elif issubclass(o.__class__, models.Model):
             return force_unicode(o)
