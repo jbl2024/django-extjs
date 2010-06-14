@@ -7,11 +7,13 @@ from django.db import models
 from django.forms import fields
 from django.forms.models import ModelChoiceField, ModelMultipleChoiceField
 from django.forms.forms import BoundField
-from django.http import Http404, HttpResponse, HttpResponseRedirect
+from django.http import Http404, HttpResponse, HttpResponseRedirect, HttpResponseNotFound
 from django.core.serializers.json import Serializer as JSONSerializer
 import simplejson
 from django.utils.functional import Promise
 from django.utils.encoding import force_unicode
+from django.shortcuts import get_object_or_404
+
 
 from django.http import HttpResponseRedirect
 from django.utils.decorators import available_attrs
@@ -350,6 +352,13 @@ def user_passes_test(test_func, login_url=None):
         return wraps(view_func, assigned=available_attrs(view_func))(_wrapped_view)
     return decorator
 
+def JsonResponseNotFound(*args, **kwargs):
+    """Send Http404 with json response
+    """
+    result = {"success": False, "reason": "not found" }
+    return HttpResponseNotFound(simplejson.dumps(result, cls=ExtJSONEncoder), mimetype='text/javascript', *args, **kwargs)
+
+
 def extjs_login_required(function=None):
     """
     Decorator for views that checks that the user is logged in.
@@ -359,3 +368,11 @@ def extjs_login_required(function=None):
         return actual_decorator(function)
     return actual_decorator
 
+def get_object_or_404_json(*args, **kwargs):
+    """Try to get an object or return a JsonResponseNotFound
+    """
+    try:
+        result = get_object_or_404(*args, **kwargs)
+    except Http404:
+        result = JsonResponseNotFound()
+    return result

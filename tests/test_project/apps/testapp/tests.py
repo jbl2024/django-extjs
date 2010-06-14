@@ -11,7 +11,7 @@ from datetime import date
 from test_project.apps.testapp.forms import ContactForm, AuthorForm, AuthorxcludeForm, WhatamessForm, WhatamessFormFK, I18nForm
 from test_project.apps.testapp.models import Author, AuthorProxy, Whatamess
 from test_project.apps.testapp.models import AuthorGrid, AuthorGrid_idsort, AuthorGrid_nofields, AuthorGridProxy, WhatamessGrid
-from extjs.utils import query_from_request, ExtJSONEncoder
+from extjs.utils import query_from_request, ExtJSONEncoder, get_object_or_404_json
 import simplejson
 
 class FormsTestCase(TestCase):
@@ -558,4 +558,14 @@ class OtherTests(TestCase):
         self.client.login(username="extjs", password="extjs")
         response = self.client.get(reverse('test_decorator'))
         self.assertTrue("I was here" in response.content)
+
+    def testObjector404(self):
+        """Test get object or 404 extj's util
+        """
+        self.auth1 = Author.objects.create(name="toto", title="ToTo", birth_date=date(2000,1,2))
+        result = get_object_or_404_json(Author, name="toto")
+        self.assertTrue(isinstance(result, Author))
+        result = get_object_or_404_json(Author, name="nothing")
+        self.assertEqual(result.status_code, 404)
+        self.assertTrue("not found" in result.content)
 
