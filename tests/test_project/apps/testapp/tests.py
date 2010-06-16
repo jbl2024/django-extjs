@@ -244,6 +244,33 @@ class GridTestCase(TestCase):
         self.assertEqual(expct_data, raw_result)
         self.assertEqual(length, 3)
 
+    def testGridbasic_nofields_start(self):
+        """Get a query from a GridModel without fields
+        """
+        qry = Author.objects.all()
+        import datetime
+        expct_data = [
+            {"id": 2, 'name': u"tata", 'title': u"TaTa", 'birth_date': datetime.date(2001, 2, 3)},
+            {"id": 3, 'name': u"tutu", 'title': u"TuTu", 'birth_date': datetime.date(2002, 3, 4)},
+        ]
+        ag = AuthorGrid_nofields()
+        raw_result, length = ag.get_rows(qry, start=1)
+        self.assertEqual(expct_data, raw_result)
+        self.assertEqual(length, 3)
+
+    def testGridbasic_nofields_limit(self):
+        """Get a query from a GridModel without fields
+        """
+        qry = Author.objects.all()
+        import datetime
+        expct_data = [
+            {"id": 2, 'name': u"tata", 'title': u"TaTa", 'birth_date': datetime.date(2001, 2, 3)},
+        ]
+        ag = AuthorGrid_nofields()
+        raw_result, length = ag.get_rows(qry, start=1, limit=1)
+        self.assertEqual(expct_data, raw_result)
+        self.assertEqual(length, 3)
+
     def testGridbasic_utf8(self):
         """Get a query from a GridModel with utf8
         """

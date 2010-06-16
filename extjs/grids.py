@@ -142,8 +142,12 @@ class ModelGrid(object):
             if f not in self._mapping.keys():
                 raise AttributeError("No mapped field '%s'" % (f))
 
+        count = queryset.count()
+
+        if start > 0:
+            queryset = queryset[int(start):]
         if limit > 0:
-            queryset = queryset[int(start):int(start) + int(limit)]
+            queryset = queryset[:int(limit)]
 
         # Now update with specials methods
         data = []
@@ -166,7 +170,7 @@ class ModelGrid(object):
                     row[field] = getattr(obj, self._mapping[field])
             data.append(row)
 
-        return data, len(data)
+        return data, count
 
     def get_rows_json(self, queryset, jsonerror=False, *args, **kwargs):
         """
