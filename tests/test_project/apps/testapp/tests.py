@@ -244,6 +244,22 @@ class GridTestCase(TestCase):
         self.assertEqual(expct_data, raw_result)
         self.assertEqual(length, 3)
 
+    def testGridbasic_nofields_noqueryset(self):
+        """Get a query from a GridModel without fields
+        try without queryset
+        """
+        qry = Author.objects.all()
+        import datetime
+        expct_data = [
+            {"id": 1, 'name': u"toto", 'title': u"ToTo", 'birth_date': datetime.date(2000, 1, 2)},
+            {"id": 2, 'name': u"tata", 'title': u"TaTa", 'birth_date': datetime.date(2001, 2, 3)},
+            {"id": 3, 'name': u"tutu", 'title': u"TuTu", 'birth_date': datetime.date(2002, 3, 4)},
+        ]
+        ag = AuthorGrid_nofields()
+        raw_result, length = ag.get_rows(list(qry),)
+        self.assertEqual(expct_data, raw_result)
+        self.assertEqual(length, 3)
+
     def testGridbasic_nofields_start(self):
         """Get a query from a GridModel without fields
         """

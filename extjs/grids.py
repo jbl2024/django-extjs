@@ -142,12 +142,15 @@ class ModelGrid(object):
             if f not in self._mapping.keys():
                 raise AttributeError("No mapped field '%s'" % (f))
 
-        count = queryset.count()
-
-        if start > 0:
-            queryset = queryset[int(start):]
-        if limit > 0:
-            queryset = queryset[:int(limit)]
+        if start or limit:
+            count = queryset.count()
+            if start > 0:
+                queryset = queryset[int(start):]
+            if limit > 0:
+                queryset = queryset[:int(limit)]
+        else:
+            # if a queryset is an object list
+            count = len(queryset)
 
         # Now update with specials methods
         data = []
