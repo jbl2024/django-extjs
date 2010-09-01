@@ -40,6 +40,12 @@ class ExtJSONEncoder(DjangoJSONEncoder):
         'editable': False,
         'triggerAction': 'all',
     }
+
+    MULTI_SELECT_EDITOR = {
+        'width': 150,
+        'xtype': 'multiselect'
+    }
+
     DATE_EDITOR = {
         'xtype': 'datefield'
     }
@@ -84,8 +90,8 @@ class ExtJSONEncoder(DjangoJSONEncoder):
         fields.EmailField: ["Ext.form.TextField", EMAIL_EDITOR],
         fields.IntegerField: ["Ext.form.NumberField", NUMBER_EDITOR],
         ModelChoiceField: ["Ext.form.ComboBox", COMBO_EDITOR],
-        ModelMultipleChoiceField: ["Ext.form.ComboBox", COMBO_EDITOR],
-        fields.MultipleChoiceField: ["Ext.form.ComboBox",COMBO_EDITOR],
+        ModelMultipleChoiceField: ["Ext.ux.form.MultiSelect", MULTI_SELECT_EDITOR],
+        fields.MultipleChoiceField: ["Ext.ux.form.MultiSelect",MULTI_SELECT_EDITOR],
         fields.NullBooleanField: ["Ext.form.Checkbox", CHECKBOX_EDITOR],
         fields.SplitDateTimeField: ["Ext.form.DateField", DATE_EDITOR],
         fields.TimeField: ["Ext.form.DateField", TIME_EDITOR],
