@@ -4,7 +4,7 @@ from copy import copy, deepcopy
 from django import forms
 from django.core.serializers.json import DjangoJSONEncoder
 from django.db import models
-from django.forms import fields
+from django.forms import fields, widgets
 from django.forms.models import ModelChoiceField, ModelMultipleChoiceField
 from django.forms.forms import BoundField
 from django.http import Http404, HttpResponse, HttpResponseRedirect, HttpResponseNotFound
@@ -63,6 +63,9 @@ class ExtJSONEncoder(DjangoJSONEncoder):
     TEXT_EDITOR = {
         'xtype': 'textfield'
     }
+    TEXTAREA_EDITOR = {
+        'xtype': 'textarea'
+    }
     TIME_EDITOR = {
         'xtype': 'timefield'
     }
@@ -98,6 +101,10 @@ class ExtJSONEncoder(DjangoJSONEncoder):
         fields.URLField: ["Ext.form.TextField", URL_EDITOR],
     }
 
+    DJANGO_EXT_WIDGET_TYPES = {
+        widgets.Textarea: ["Ext.form.TextArea", TEXTAREA_EDITOR],
+    }
+    
     EXT_DATE_ALT_FORMATS = 'm/d/Y|n/j/Y|n/j/y|m/j/y|n/d/y|m/j/Y|n/d/Y|m-d-y|m-d-Y|m/d|m-d|md|mdy|mdY|d|Y-m-d'
 
     EXT_TIME_ALT_FORMATS = 'm/d/Y|m-d-y|m-d-Y|m/d|m-d|d'
@@ -165,16 +172,20 @@ class ExtJSONEncoder(DjangoJSONEncoder):
 
         # Serialize BoundFields
         elif issubclass(o.__class__, BoundField):
-            # print o.field.__class__
             default_config = {}
             if o.field.__class__ in self.DJANGO_EXT_FIELD_TYPES:
                 default_config.update(self.DJANGO_EXT_FIELD_TYPES[o.field.__class__][1])
-                #print default_config
+
+                print o.field.widget.__class__
+                if o.field.widget.__class__ in self.DJANGO_EXT_WIDGET_TYPES:
+                    default_config.update(self.DJANGO_EXT_WIDGET_TYPES[o.field.widget.__class__][1])
+                
             else:
                 default_config.update(self.EXT_DEFAULT_CONFIG['editor'])
             config = deepcopy(default_config)
             for dj, ext in self.DJANGO_EXT_FIELD_ATTRS.items():
                 v = None
+
                 # Adapt the value with type of field
                 if dj == 'size':
                     v = o.field.widget.attrs.get(dj, None)
