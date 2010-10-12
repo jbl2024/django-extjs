@@ -187,6 +187,25 @@ class FormsDataTestCase(TestCase):
         expct = {u"success": True, u"data": expct_data}
         self.assertEqual(expct, simplejson.loads(cf.as_extjsdata()))
 
+    def testModelFormComplexwithAuthor(self):
+        """Test a ModelForm with lot of fields and an Author
+        """
+        from datetime import date
+        auth = Author.objects.create(name="toto", title="toto", birth_date=date(2000,1,2))
+        wam1 = Whatamess.objects.create(name="toto", title=1, birth_date=date(2000,1,2), yesno=True, number=1)
+        cf = WhatamessForm(instance=wam1)
+        expct = {"items":[
+            {"fieldLabel": "Name", "xtype": "textfield", "fieldHidden": False, "header": "name", "allowBlank": False, "helpText": "", "maxLength": 100, "name": "name", "value": "toto"},
+            {"fieldLabel": "Number", "allowBlank": False, "fieldHidden": False, "name": "number", "header": "number", "helpText": "", "xtype": "numberfield", "value": 1},
+            {"fieldLabel": "Slug", "xtype": "textfield", "fieldHidden": False, "header": "slug", "allowBlank": False, "helpText": "", "maxLength": 50, "name": "slug", "value": ""},
+            {"fieldLabel": "Text", "allowBlank": False, "fieldHidden": False, "name": "text", "header": "text", "helpText": "", "xtype": "textarea", "value": ""},
+            {"xtype": "combo", "forceSelection": True, "editable": False, "triggerAction": 'all', "hiddenName": "author", "fieldLabel": "Author", "name": "author", "header": "author", "fieldHidden": False, "value": "", "width": 150, "allowBlank": True, "helpText": "", "mode": "local", "store": [["", "---------"], ['1', 'toto'],], "listWidth": "auto"},
+            {"xtype": "combo", "forceSelection": True, "editable": False, "triggerAction": 'all', "hiddenName": "title", "fieldLabel": "Title", "name": "title", "header": "title", "fieldHidden": False, "value": 1, "width": 150, "allowBlank": False, "helpText": "", "mode": "local", "store": [["", "---------"], ["1", "Mr."], ["2", "Mrs."], ["3", "Ms."]], "listWidth": "auto"},
+            {"fieldLabel": "Birth date", "allowBlank": True, "fieldHidden": False, "name": "birth_date", "header": "birth_date", "helpText": "", "xtype": "datefield", "value": "2000-01-02"},
+            {"fieldLabel": "Yesno", "xtype": "checkbox", "fieldHidden": False, "value": True, "header": "yesno", "allowBlank": True, "helpText": "", "name": "yesno"}
+            ]}
+        self.assertEqual(expct, simplejson.loads(cf.as_extjs()))
+
 class GridTestCase(TestCase):
     def setUp(self):
         """
