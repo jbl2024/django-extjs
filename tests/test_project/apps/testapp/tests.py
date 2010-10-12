@@ -25,10 +25,16 @@ class FormsTestCase(TestCase):
             {'vtype': 'email', 'fieldLabel': 'sender', 'allowBlank': False, 'fieldHidden': False, 'name': 'sender', 'header': 'sender', 'helpText': '', 'xtype': 'textfield'},
             {'fieldLabel': 'cc_myself', 'xtype': 'checkbox', 'fieldHidden': False, 'value': False, 'name': 'cc_myself', 'header': 'cc_myself', 'helpText': '', 'allowBlank': True},
         ]}
-        self.assertEqual(expct, simplejson.loads(cf.as_extjs()))
-        cf = ContactForm({'subject':'PONY'})
+        result = simplejson.loads(cf.as_extjs())
+        self.assertEqual(expct, result)
+        cf = ContactForm({'subject':'PONY', 'cc_myself':True})
+        result = simplejson.loads(cf.as_extjs())
+        self.assertEqual(result["items"][0]["value"], "PONY")
+        self.assertEqual(result["items"][3]["value"], True)
+
         expct["items"][0]["value"] = "PONY"
-        self.assertEqual(expct, simplejson.loads(cf.as_extjs()))
+        expct["items"][3]["value"] = True
+        self.assertEqual(expct, result)
 
     def testModelFormbasic(self):
         """Test a ModelForm
