@@ -236,6 +236,8 @@ class ExtJSONEncoder(DjangoJSONEncoder):
                     ejs, df = ext # extjsfield name, default value
                     if ejs == 'value':
                         config[ejs] = v
+                        if default_config == self.CHECKBOX_EDITOR:
+                            config['checked'] = v
                     if ejs == 'name':
                         config[ejs] = v
                         config['header'] = v

@@ -23,7 +23,7 @@ class FormsTestCase(TestCase):
             {'fieldLabel': 'subject', 'xtype': 'textfield', 'fieldHidden': False, 'name': 'subject', 'header': 'subject', 'helpText': '', 'maxLength': 100, 'allowBlank': False},
             {'fieldLabel': 'message', 'xtype': 'textfield', 'fieldHidden': False, 'value': 'pony', 'name': 'message', 'header': 'message', 'helpText': '', 'allowBlank': False},
             {'vtype': 'email', 'fieldLabel': 'sender', 'allowBlank': False, 'fieldHidden': False, 'name': 'sender', 'header': 'sender', 'helpText': '', 'xtype': 'textfield'},
-            {'fieldLabel': 'cc_myself', 'xtype': 'checkbox', 'fieldHidden': False, 'value': False, 'name': 'cc_myself', 'header': 'cc_myself', 'helpText': '', 'allowBlank': True},
+            {'fieldLabel': 'cc_myself', 'xtype': 'checkbox', 'fieldHidden': False, 'value': False, 'name': 'cc_myself', 'header': 'cc_myself', 'helpText': '', 'allowBlank': True, 'checked': False},
         ]}
         result = simplejson.loads(cf.as_extjs())
         self.assertEqual(expct, result)
@@ -34,6 +34,7 @@ class FormsTestCase(TestCase):
 
         expct["items"][0]["value"] = "PONY"
         expct["items"][3]["value"] = True
+        expct["items"][3]["checked"] = True
         self.assertEqual(expct, result)
 
     def testModelFormbasic(self):
@@ -72,7 +73,7 @@ class FormsTestCase(TestCase):
             {"xtype": "combo", "forceSelection": True, "editable": False, "triggerAction": 'all', "hiddenName": "author", "fieldLabel": "Author", "name": "author", "header": "author", "fieldHidden": False, "value": "", "width": 150, "allowBlank": True, "helpText": "", "mode": "local", "store": [["", "---------"]], "listWidth": "auto"},
             {"xtype": "combo", "forceSelection": True, "editable": False, "triggerAction": 'all', "hiddenName": "title", "fieldLabel": "Title", "name": "title", "header": "title", "fieldHidden": False, "value": "", "width": 150, "allowBlank": False, "helpText": "", "mode": "local", "store": [["", "---------"], ["1", "Mr."], ["2", "Mrs."], ["3", "Ms."]], "listWidth": "auto"},
             {"fieldLabel": "Birth date", "allowBlank": True, "fieldHidden": False, "name": "birth_date", "header": "birth_date", "helpText": "", "xtype": "datefield"},
-            {"fieldLabel": "Yesno", "xtype": "checkbox", "fieldHidden": False, "value": False, "header": "yesno", "allowBlank": True, "helpText": "", "name": "yesno"}
+            {"fieldLabel": "Yesno", "xtype": "checkbox", "fieldHidden": False, "value": False, "header": "yesno", "allowBlank": True, "helpText": "", "name": "yesno", 'checked': False}
             ]}
         self.assertEqual(expct, simplejson.loads(cf.as_extjs()))
 
@@ -109,7 +110,7 @@ class FormsTestCase(TestCase):
             {"xtype": "combo", "forceSelection": True, "editable": False, "triggerAction": 'all', "hiddenName": "author", "fieldLabel": "Author", "name": "author", "header": "author", "fieldHidden": False, "value": "", "width": 150, "allowBlank": True, "helpText": "", "mode": "local", "store": [["", "---------"], ['1', 'toto'],], "listWidth": "auto"},
             {"xtype": "combo", "forceSelection": True, "editable": False, "triggerAction": 'all', "hiddenName": "title", "fieldLabel": "Title", "name": "title", "header": "title", "fieldHidden": False, "value": "", "width": 150, "allowBlank": False, "helpText": "", "mode": "local", "store": [["", "---------"], ["1", "Mr."], ["2", "Mrs."], ["3", "Ms."]], "listWidth": "auto"},
             {"fieldLabel": "Birth date", "allowBlank": True, "fieldHidden": False, "name": "birth_date", "header": "birth_date", "helpText": "", "xtype": "datefield"},
-            {"fieldLabel": "Yesno", "xtype": "checkbox", "fieldHidden": False, "value": False, "header": "yesno", "allowBlank": True, "helpText": "", "name": "yesno"}
+            {"fieldLabel": "Yesno", "xtype": "checkbox", "fieldHidden": False, "value": False, "header": "yesno", "allowBlank": True, "helpText": "", "name": "yesno", 'checked': False}
             ]}
         self.assertEqual(expct, simplejson.loads(cf.as_extjs()))
 
@@ -188,7 +189,7 @@ class FormsDataTestCase(TestCase):
         self.assertEqual(expct, simplejson.loads(cf.as_extjsdata()))
 
     def testModelFormComplexwithAuthor(self):
-        """Test a ModelForm with lot of fields and an Author
+        """Test a ModelForm with lot of fields and an Author filled with data
         """
         from datetime import date
         auth = Author.objects.create(name="toto", title="toto", birth_date=date(2000,1,2))
@@ -202,7 +203,7 @@ class FormsDataTestCase(TestCase):
             {"xtype": "combo", "forceSelection": True, "editable": False, "triggerAction": 'all', "hiddenName": "author", "fieldLabel": "Author", "name": "author", "header": "author", "fieldHidden": False, "value": "", "width": 150, "allowBlank": True, "helpText": "", "mode": "local", "store": [["", "---------"], ['1', 'toto'],], "listWidth": "auto"},
             {"xtype": "combo", "forceSelection": True, "editable": False, "triggerAction": 'all', "hiddenName": "title", "fieldLabel": "Title", "name": "title", "header": "title", "fieldHidden": False, "value": 1, "width": 150, "allowBlank": False, "helpText": "", "mode": "local", "store": [["", "---------"], ["1", "Mr."], ["2", "Mrs."], ["3", "Ms."]], "listWidth": "auto"},
             {"fieldLabel": "Birth date", "allowBlank": True, "fieldHidden": False, "name": "birth_date", "header": "birth_date", "helpText": "", "xtype": "datefield", "value": "2000-01-02"},
-            {"fieldLabel": "Yesno", "xtype": "checkbox", "fieldHidden": False, "value": True, "header": "yesno", "allowBlank": True, "helpText": "", "name": "yesno"}
+            {"fieldLabel": "Yesno", "xtype": "checkbox", "fieldHidden": False, "value": True, "header": "yesno", "allowBlank": True, "helpText": "", "name": "yesno", "checked": True}
             ]}
         self.assertEqual(expct, simplejson.loads(cf.as_extjs()))
 
