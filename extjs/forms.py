@@ -44,10 +44,24 @@ class ExtJsForm(object):
         return html
 
     @staticmethod
-    def as_extjsfields(self, excludes = []):
-        """Return field of Form in list
+    def as_extjsfields(self, includes=[], excludes=[]):
+        """Return fields of Form in dict
         """
-        raise NotImplementedError("Not used")
+        if excludes:
+            raise NotImplementedError()
+        result = {}
+
+        for name, field in self.fields.items():
+            if name in includes:
+                if isinstance(field, dict):
+                    field['title'] = name
+                else:
+                    field.name = name
+                # Bound fields with data
+                bf = BoundField(self, field, name)
+                # loads/dumps is ugly but almost resilient
+                result[name] = simplejson.loads(simplejson.dumps(bf, cls=utils.ExtJSONEncoder))
+        return result
 
     @staticmethod
     def as_extjsdata(self,):

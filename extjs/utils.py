@@ -145,7 +145,6 @@ class ExtJSONEncoder(DjangoJSONEncoder):
                 bf = BoundField(o, field, name)
                 cfg = self.default(bf)
                 flds.append(cfg)
-
             return flds
 
         if isinstance(o, Promise):

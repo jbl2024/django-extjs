@@ -189,7 +189,7 @@ class FormsDataTestCase(TestCase):
         self.assertEqual(expct, simplejson.loads(cf.as_extjsdata()))
 
     def testModelFormComplexwithAuthor(self):
-        """Test a ModelForm with lot of fields and an Author filled with data
+        """Test a ModelForm with lot of fields and an Author filed with data
         """
         from datetime import date
         auth = Author.objects.create(name="toto", title="toto", birth_date=date(2000,1,2))
@@ -206,6 +206,19 @@ class FormsDataTestCase(TestCase):
             {"fieldLabel": "Yesno", "xtype": "checkbox", "fieldHidden": False, "value": True, "header": "yesno", "allowBlank": True, "helpText": "", "name": "yesno", "checked": True}
             ]}
         self.assertEqual(expct, simplejson.loads(cf.as_extjs()))
+
+    def testModelFormComplexwithAuthorOnlyFields(self):
+        """Test a ModelForm with lot of fields and an Author filed with data, get only 3 fields
+        """
+        from datetime import date
+        auth = Author.objects.create(name="toto", title="toto", birth_date=date(2000,1,2))
+        wam1 = Whatamess.objects.create(name="toto", title=1, birth_date=date(2000,1,2), yesno=True, number=1)
+        cf = WhatamessForm(instance=wam1)
+        expct = {"slug" : {"fieldLabel": "Slug", "xtype": "textfield", "fieldHidden": False, "header": "slug", "allowBlank": False, "helpText": "", "maxLength": 50, "name": "slug", "value": ""},
+                 "text" : {"fieldLabel": "Text", "allowBlank": False, "fieldHidden": False, "name": "text", "header": "text", "helpText": "", "xtype": "textarea", "value": ""},
+                 "yesno" : {"fieldLabel": "Yesno", "xtype": "checkbox", "fieldHidden": False, "value": True, "header": "yesno", "allowBlank": True, "helpText": "", "name": "yesno", "checked": True}
+                }
+        self.assertEqual(expct, cf.as_extjsfields(["slug", "text", "yesno"]))
 
 class GridTestCase(TestCase):
     def setUp(self):
