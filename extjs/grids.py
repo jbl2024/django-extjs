@@ -155,13 +155,18 @@ class ModelGrid(object):
         # Now update with specials methods
         data = []
         for obj in queryset:
+            fk_obj = None
+            old_fk_obj = None
+            relation = None
             row = {}
             for field in fields:
                 if "__" in self._mapping[field]:
                     # Handle ForeignKeys
                     from copy import copy
+                    old_fk_obj = copy(fk_obj)
                     fk_obj = copy(obj)
                     for relation in self._mapping[field].split("__"):
+
                         # For FK with null=True, getattr will raise an AttributeError
                         try:
                             fk_obj = getattr(fk_obj, relation)
@@ -171,6 +176,22 @@ class ModelGrid(object):
                     row[field] = fk_obj
                 else:
                     row[field] = getattr(obj, self._mapping[field])
+
+                # Get choices elements
+                if row[field]:
+                    _obj = old_fk_obj or obj
+                    # Notes on old_fk_obj
+                    #
+                    # We take the old fk object because in 'blah__author__title':
+                    # fk_obj is 'title'
+                    # fk_old_object is author
+                    # so we try "get_title_display" on "author" obj
+
+                    _field = relation or self._mapping[field]
+                    display = getattr(_obj, "get_%s_display" % _field, None)
+                    if display:
+                        row["%s_display" % field] = display()
+
             data.append(row)
 
         return data, count

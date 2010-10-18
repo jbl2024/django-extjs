@@ -80,3 +80,11 @@ class WhatamessGrid(grids.ModelGrid):
     }
     fields = ['name', 'author']
 
+class WhatamessGridChoices(grids.ModelGrid):
+    model = Whatamess
+    list_mapping = ['name', 'author', 'title']
+    mapping = {
+        'atitle': "author__title",
+    }
+    fields = ['name', 'author', 'title']
+

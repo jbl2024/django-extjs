@@ -10,7 +10,7 @@ from datetime import date
 
 from test_project.apps.testapp.forms import ContactForm, AuthorForm, AuthorxcludeForm, WhatamessForm, WhatamessFormFK, I18nForm
 from test_project.apps.testapp.models import Author, AuthorProxy, Whatamess
-from test_project.apps.testapp.models import AuthorGrid, AuthorGrid_idsort, AuthorGrid_nofields, AuthorGridProxy, WhatamessGrid
+from test_project.apps.testapp.models import AuthorGrid, AuthorGrid_idsort, AuthorGrid_nofields, AuthorGridProxy, WhatamessGrid, WhatamessGridChoices
 from extjs.utils import query_from_request, ExtJSONEncoder, get_object_or_404_json
 import simplejson
 
@@ -224,12 +224,12 @@ class GridTestCase(TestCase):
     def setUp(self):
         """
         """
-        self.auth1 = Author.objects.create(name="toto", title="ToTo", birth_date=date(2000,1,2))
-        self.auth2 = Author.objects.create(name="tata", title="TaTa", birth_date=date(2001,2,3))
-        self.auth3 = Author.objects.create(name="tutu", title="TuTu", birth_date=date(2002,3,4))
+        self.auth1 = Author.objects.create(name="toto", title="MR", birth_date=date(2000,1,2))
+        self.auth2 = Author.objects.create(name="tata", title="MR", birth_date=date(2001,2,3))
+        self.auth3 = Author.objects.create(name="tutu", title="MRS", birth_date=date(2002,3,4))
         self.wam1 = Whatamess.objects.create(name="dodo", title=1, number=1, text="d o d o", author=self.auth1, yesno=True, birth_date=date(2000,1,2))
         self.wam2 = Whatamess.objects.create(name="dada", title=1, number=2, text="d a d a", author=self.auth2, yesno=True, birth_date=date(2001,2,3))
-        self.wam3 = Whatamess.objects.create(name="dudu", title=1, number=3, text="d u d u", author=self.auth3, yesno=True, birth_date=date(2002,3,4))
+        self.wam3 = Whatamess.objects.create(name="dudu", title=2, number=3, text="d u d u", author=self.auth3, yesno=True, birth_date=date(2002,3,4))
 
     def testGridbasic(self):
         """Get a query from a GridModel
@@ -237,9 +237,9 @@ class GridTestCase(TestCase):
         qry = Author.objects.all()
         import datetime
         expct_data = [
-            {'his_name': u"toto", 'title': u"ToTo", 'birth_date': datetime.date(2000, 1, 2)},
-            {'his_name': u"tata", 'title': u"TaTa", 'birth_date': datetime.date(2001, 2, 3)},
-            {'his_name': u"tutu", 'title': u"TuTu", 'birth_date': datetime.date(2002, 3, 4)},
+            {'his_name': u"toto", 'title': u"MR", 'title_display': "Mr.", 'birth_date': datetime.date(2000, 1, 2)},
+            {'his_name': u"tata", 'title': u"MR", 'title_display': "Mr.", 'birth_date': datetime.date(2001, 2, 3)},
+            {'his_name': u"tutu", 'title': u"MRS", 'title_display': "Mrs.", 'birth_date': datetime.date(2002, 3, 4)},
         ]
         ag = AuthorGrid()
         raw_result, length = ag.get_rows(qry,)
@@ -248,9 +248,9 @@ class GridTestCase(TestCase):
 
         # And now get result in JSONResponse
         expct_data = [
-            {'title': u"ToTo", 'birth_date': u"2000-01-02", 'his_name': u"toto"},
-            {'title': u"TaTa", 'birth_date': u"2001-02-03", 'his_name': u"tata"},
-            {'title': u"TuTu", 'birth_date': u"2002-03-04", 'his_name': u"tutu"},
+            {'title': u"MR", 'title_display': "Mr.", 'birth_date': u"2000-01-02", 'his_name': u"toto"},
+            {'title': u"MR", 'title_display': "Mr.", 'birth_date': u"2001-02-03", 'his_name': u"tata"},
+            {'title': u"MRS", 'title_display': "Mrs.", 'birth_date': u"2002-03-04", 'his_name': u"tutu"},
         ]
         expct = {u"success": True, u"data": expct_data, u'results': 3}
         jsonresult = ag.get_rows_json(qry, fields=['title', 'birth_date', 'his_name'])
@@ -261,9 +261,9 @@ class GridTestCase(TestCase):
         response = self.client.get("/api/author/getjson")
         result = simplejson.loads(response.content)
         expct_data = [
-            {'his_name': "toto", 'title': "ToTo", 'birth_date': "2000-01-02"},
-            {'his_name': "tata", 'title': "TaTa", 'birth_date': "2001-02-03"},
-            {'his_name': "tutu", 'title': "TuTu", 'birth_date': "2002-03-04"},
+            {'his_name': "toto", 'title': "MR", 'title_display': "Mr.", 'birth_date': "2000-01-02"},
+            {'his_name': "tata", 'title': "MR", 'title_display': "Mr.", 'birth_date': "2001-02-03"},
+            {'his_name': "tutu", 'title': "MRS", 'title_display': "Mrs.", 'birth_date': "2002-03-04"},
         ]
         expct = {"success": True, "data": expct_data, 'results': 3}
         self.assertEqual(expct, result)
@@ -274,9 +274,9 @@ class GridTestCase(TestCase):
         qry = Author.objects.all()
         import datetime
         expct_data = [
-            {"id": 1, 'name': u"toto", 'title': u"ToTo", 'birth_date': datetime.date(2000, 1, 2)},
-            {"id": 2, 'name': u"tata", 'title': u"TaTa", 'birth_date': datetime.date(2001, 2, 3)},
-            {"id": 3, 'name': u"tutu", 'title': u"TuTu", 'birth_date': datetime.date(2002, 3, 4)},
+            {"id": 1, 'name': u"toto", 'title': u"MR", 'title_display': "Mr.", 'birth_date': datetime.date(2000, 1, 2)},
+            {"id": 2, 'name': u"tata", 'title': u"MR", 'title_display': "Mr.", 'birth_date': datetime.date(2001, 2, 3)},
+            {"id": 3, 'name': u"tutu", 'title': u"MRS", 'title_display': "Mrs.", 'birth_date': datetime.date(2002, 3, 4)},
         ]
         ag = AuthorGrid_nofields()
         raw_result, length = ag.get_rows(qry,)
@@ -290,9 +290,9 @@ class GridTestCase(TestCase):
         qry = Author.objects.all()
         import datetime
         expct_data = [
-            {"id": 1, 'name': u"toto", 'title': u"ToTo", 'birth_date': datetime.date(2000, 1, 2)},
-            {"id": 2, 'name': u"tata", 'title': u"TaTa", 'birth_date': datetime.date(2001, 2, 3)},
-            {"id": 3, 'name': u"tutu", 'title': u"TuTu", 'birth_date': datetime.date(2002, 3, 4)},
+            {"id": 1, 'name': u"toto", 'title': u"MR", 'title_display': "Mr.", 'birth_date': datetime.date(2000, 1, 2)},
+            {"id": 2, 'name': u"tata", 'title': u"MR", 'title_display': "Mr.",  'birth_date': datetime.date(2001, 2, 3)},
+            {"id": 3, 'name': u"tutu", 'title': u"MRS", 'title_display': "Mrs.",  'birth_date': datetime.date(2002, 3, 4)},
         ]
         ag = AuthorGrid_nofields()
         raw_result, length = ag.get_rows(list(qry),)
@@ -305,8 +305,8 @@ class GridTestCase(TestCase):
         qry = Author.objects.all()
         import datetime
         expct_data = [
-            {"id": 2, 'name': u"tata", 'title': u"TaTa", 'birth_date': datetime.date(2001, 2, 3)},
-            {"id": 3, 'name': u"tutu", 'title': u"TuTu", 'birth_date': datetime.date(2002, 3, 4)},
+            {"id": 2, 'name': u"tata", 'title': u"MR", 'title_display': "Mr.", 'birth_date': datetime.date(2001, 2, 3)},
+            {"id": 3, 'name': u"tutu", 'title': u"MRS", 'title_display': "Mrs.", 'birth_date': datetime.date(2002, 3, 4)},
         ]
         ag = AuthorGrid_nofields()
         raw_result, length = ag.get_rows(qry, start=1)
@@ -319,7 +319,7 @@ class GridTestCase(TestCase):
         qry = Author.objects.all()
         import datetime
         expct_data = [
-            {"id": 2, 'name': u"tata", 'title': u"TaTa", 'birth_date': datetime.date(2001, 2, 3)},
+            {"id": 2, 'name': u"tata", 'title': u"MR", 'title_display': "Mr.", 'birth_date': datetime.date(2001, 2, 3)},
         ]
         ag = AuthorGrid_nofields()
         raw_result, length = ag.get_rows(qry, start=1, limit=1)
@@ -336,10 +336,10 @@ class GridTestCase(TestCase):
 
         # And now get result in JSONResponse
         expct_data = [
-            {'title': u"ToTo", 'birth_date': u"2000-01-02", 'his_name': u"toto"},
-            {'title': u"TaTa", 'birth_date': u"2001-02-03", 'his_name': u"tata"},
-            {'title': u"TuTu", 'birth_date': u"2002-03-04", 'his_name': u"tutu"},
-            {'title': u"TéTé", 'birth_date': u"2000-01-02", 'his_name': u"tété"},
+            {'title': u"MR", 'title_display': "Mr.", 'birth_date': u"2000-01-02", 'his_name': u"toto"},
+            {'title': u"MR", 'title_display': "Mr.", 'birth_date': u"2001-02-03", 'his_name': u"tata"},
+            {'title': u"MRS", 'title_display': "Mrs.", 'birth_date': u"2002-03-04", 'his_name': u"tutu"},
+            {'title': u"TéTé", 'title_display': u"TéTé", 'birth_date': u"2000-01-02", 'his_name': u"tété"},
         ]
         ag = AuthorGrid()
         expct = {u"success": True, u"data": expct_data, u'results': 4}
@@ -372,9 +372,9 @@ class GridTestCase(TestCase):
         qry = AuthorProxy.objects.all()
         import datetime
         expct_data = [
-            {'uid': 1, 'name': u"toto", 'title': u"ToTo", 'birth_date': datetime.date(2000, 1, 2)},
-            {'uid': 2, 'name': u"tata", 'title': u"TaTa", 'birth_date': datetime.date(2001, 2, 3)},
-            {'uid': 3, 'name': u"tutu", 'title': u"TuTu", 'birth_date': datetime.date(2002, 3, 4)},
+            {'uid': 1, 'name': u"toto", 'title': u"MR", 'title_display': "Mr.", 'birth_date': datetime.date(2000, 1, 2)},
+            {'uid': 2, 'name': u"tata", 'title': u"MR", 'title_display': "Mr.", 'birth_date': datetime.date(2001, 2, 3)},
+            {'uid': 3, 'name': u"tutu", 'title': u"MRS", 'title_display': "Mrs.", 'birth_date': datetime.date(2002, 3, 4)},
         ]
         ag = AuthorGridProxy()
         raw_result, length = ag.get_rows(qry,)
@@ -383,9 +383,9 @@ class GridTestCase(TestCase):
 
         # Use method
         expct_data = [
-            {'name': u"toto", 'title': u"ToTo", 'birth_date': datetime.date(2000, 1, 2), "aprint" : "Proxy here : toto"},
-            {'name': u"tata", 'title': u"TaTa", 'birth_date': datetime.date(2001, 2, 3), "aprint" : "Proxy here : tata"},
-            {'name': u"tutu", 'title': u"TuTu", 'birth_date': datetime.date(2002, 3, 4), "aprint" : "Proxy here : tutu"},
+            {'name': u"toto", 'title': u"MR", 'title_display': "Mr.", 'birth_date': datetime.date(2000, 1, 2), "aprint" : "Proxy here : toto"},
+            {'name': u"tata", 'title': u"MR", 'title_display': "Mr.", 'birth_date': datetime.date(2001, 2, 3), "aprint" : "Proxy here : tata"},
+            {'name': u"tutu", 'title': u"MRS", 'title_display': "Mrs.", 'birth_date': datetime.date(2002, 3, 4), "aprint" : "Proxy here : tutu"},
         ]
         ag = AuthorGridProxy()
         raw_result, length = ag.get_rows(qry, fields=['name', 'title', 'birth_date', 'aprint'])
@@ -409,6 +409,24 @@ class GridTestCase(TestCase):
         result = simplejson.loads(jsonresult)
         self.assertEqual(expct, result)
 
+    def testGridComplexChoices(self):
+        """test FK resolutions in ExtJSONEncoder and
+        choices resolution
+        """
+        qry = Whatamess.objects.all()
+        import datetime
+        # Use method
+        expct_data = [
+            {u'name': u"dodo", u'author': u'toto', u'title': 1, u'title_display': u'Mr.'},
+            {u'name': u"dada", u'author': u'tata', u'title': 1, u'title_display': u'Mr.'},
+            {u'name': u"dudu", u'author': u'tutu', u'title': 2, u'title_display': u'Mrs.'},
+        ]
+        wg = WhatamessGridChoices()
+        expct = {u"success": True, u"data": expct_data, u'results': 3}
+        jsonresult = wg.get_rows_json(qry)
+        result = simplejson.loads(jsonresult)
+        self.assertEqual(expct, result)
+
     def testGridComplexFK(self):
         """test FK resolutions in ExtJSONEncoder
         """
@@ -416,9 +434,9 @@ class GridTestCase(TestCase):
         qry = Whatamess.objects.all()
         wg = WhatamessGrid()
         expct_data = [
-            {'atitle': 'ToTo'},
-            {'atitle': 'TaTa'},
-            {'atitle': 'TuTu'},
+            {'atitle': 'MR', 'atitle_display': "Mr."},
+            {'atitle': 'MR', 'atitle_display': "Mr."},
+            {'atitle': 'MRS', 'atitle_display': "Mrs."},
         ]
         expct = (expct_data, 3)
         result = wg.get_rows(qry, fields=['atitle',])
@@ -433,7 +451,7 @@ class GridTestCase(TestCase):
                     title: 'Array Grid',
                     // config options for stateful behavior
                     stateful: true,
-                    stateId: 'grid'        
+                    stateId: 'grid'
         }"""
         pass
         #jsonresult = ag.get_rows(qry)
@@ -447,9 +465,9 @@ class GridTestCase(TestCase):
         ag = AuthorGrid()
         # And now get result in JSONResponse
         expct_data = [
-            {'title': u"ToTo", 'birth_date': u"2000-01-02", 'name': u"toto"},
-            {'title': u"TaTa", 'birth_date': u"2001-02-03", 'name': u"tata"},
-            {'title': u"TuTu", 'birth_date': u"2002-03-04", 'name': u"tutu"},
+            {'title': u"MR", 'title_display': "Mr.", 'birth_date': u"2000-01-02", 'name': u"toto"},
+            {'title': u"MR", 'title_display': "Mr.", 'birth_date': u"2001-02-03", 'name': u"tata"},
+            {'title': u"MRS", 'title_display': "Mrs.", 'birth_date': u"2002-03-04", 'name': u"tutu"},
         ]
         expct = {u"success": False, u"message": "Error : No mapped field 'titl'"}
         jsonresult = ag.get_rows_json(qry, fields=['titl', 'birth_date', 'name'], jsonerror=True)
@@ -466,9 +484,9 @@ class GridTestCase(TestCase):
         qry = Whatamess.objects.all()
         wg = WhatamessGrid()
         expct_data = [
-            {'atitle': 'ToTo'},
-            {'atitle': 'TaTa'},
-            {'atitle': 'TuTu'},
+            {'atitle': 'MR', 'atitle_display': "Mr."},
+            {'atitle': 'MR', 'atitle_display': "Mr."},
+            {'atitle': 'MRS', 'atitle_display': "Mrs."},
             {'atitle': None},
         ]
         expct = (expct_data, 4)
