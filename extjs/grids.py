@@ -123,10 +123,12 @@ class ModelGrid(object):
         """Wrap for query_from_request
         """
         fields = fields or self.fields
-
         dfields = {}
-        for x in fields:
-            dfields[x] = self._mapping[x]
+        if type(fields) == type([]):
+            for x in fields:
+                dfields[x] = self._mapping[x]
+        else:
+            dfields = fields
         return utils.query_from_request(request, queryset, dfields)
 
     def get_rows(self, queryset, start=0, limit=0, fields=None, *args, **kwargs):
