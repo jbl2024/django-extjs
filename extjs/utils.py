@@ -98,6 +98,7 @@ class ExtJSONEncoder(DjangoJSONEncoder):
     DJANGO_EXT_FIELD_TYPES = {
         fields.BooleanField: ["Ext.form.Checkbox", CHECKBOX_EDITOR],
         fields.CharField: ["Ext.form.TextField", TEXT_EDITOR],
+        fields.IPAddressField: ["Ext.form.TextField", TEXT_EDITOR],
         fields.SlugField: ["Ext.form.TextField", TEXT_EDITOR],
         fields.ChoiceField: ["Ext.form.ComboBox", COMBO_EDITOR],
         fields.TypedChoiceField: ["Ext.form.ComboBox", COMBO_EDITOR],
@@ -194,7 +195,7 @@ class ExtJSONEncoder(DjangoJSONEncoder):
                     default_config.update(self.DJANGO_EXT_WIDGET_TYPES[o.field.widget.__class__][1])
                 
             else:
-                default_config.update(self.EXT_DEFAULT_CONFIG['editor'])
+                default_config.update(self.EXT_DEFAULT_CONFIG)
             config = deepcopy(default_config)
             for dj, ext in self.DJANGO_EXT_FIELD_ATTRS.items():
                 v = None
