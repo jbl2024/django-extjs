@@ -16,7 +16,21 @@ from django.shortcuts import get_object_or_404
 
 
 from django.http import HttpResponseRedirect
-from django.utils.decorators import available_attrs
+try:
+    from django.utils.decorators import available_attrs
+except ImportError:
+    # django 1.1
+    try:
+        from functools import wraps, update_wrapper, WRAPPER_ASSIGNMENTS
+    except ImportError:
+        from django.utils.functional import wraps, update_wrapper, WRAPPER_ASSIGNMENTS  # Python 2.4 fallback.
+    def available_attrs(fn):
+        """
+        Return the list of functools-wrappable attributes on a callable.
+        This is required as a workaround for http://bugs.python.org/issue3445.
+        """
+        return tuple(a for a in WRAPPER_ASSIGNMENTS if hasattr(fn, a))
+
 try:
     from functools import update_wrapper, wraps
 except ImportError:
@@ -353,7 +367,8 @@ def JsonError(error = ''):
     result = {"success": False, "msg": error }
     return JsonResponse(simplejson.dumps(result, cls=ExtJSONEncoder))
 
-def JsonSuccess(context, *args, **kwargs):
+def JsonSuccess(context=None, *args, **kwargs):
+    if not context: context = {}
     context.update({'success': True})
     return JsonResponse(simplejson.dumps(context, cls=ExtJSONEncoder), *args, **kwargs)
 
