@@ -9,6 +9,7 @@ from django.forms.models import ModelChoiceField, ModelMultipleChoiceField
 from django.forms.forms import BoundField
 from django.http import Http404, HttpResponse, HttpResponseRedirect, HttpResponseNotFound
 from django.core.serializers.json import Serializer as JSONSerializer
+from django.utils.text import capfirst
 import simplejson
 from django.utils.functional import Promise
 from django.utils.encoding import force_unicode
@@ -234,7 +235,7 @@ class ExtJSONEncoder(DjangoJSONEncoder):
                     if v is None:
                         v = getattr(o.field, 'label', None)
                         if v is None:
-                            v = o.field.name
+                            v = capfirst(o.field.name.replace("_", " "))
                         else:
                             v = force_unicode(v)
                 elif getattr(o.field, dj, ext[1]) is None:
