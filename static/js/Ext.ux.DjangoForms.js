@@ -155,7 +155,6 @@ Ext.ux.DjangoForm = Ext.extend(Ext.FormPanel, {
         });
     },
     resetForm: function(){
-        console.log('resetForm');
         this.getForm().reset();
     },
     submitForm: function(){

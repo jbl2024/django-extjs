@@ -23,8 +23,8 @@ class ExtJsForm(object):
         cls.as_extjsdata = self.as_extjsdata
         cls.html_errorlist = self.html_errorlist
         # default submit handler
-        handler_submit = "function(btn) {console.log(this, btn);this.findParentByType(this.form_xtype).submitForm()}"
-        handler_reset = "function(btn) {console.log(this, btn);this.findParentByType(this.form_xtype).resetForm()}"
+        handler_submit = "function(btn) {this.findParentByType(this.form_xtype).submitForm()}"
+        handler_reset = "function(btn) {this.findParentByType(this.form_xtype).resetForm()}"
         cls.ext_baseConfig = {
         }
 
