@@ -353,6 +353,10 @@ def JsonError(error = ''):
     result = {"success": False, "msg": error }
     return JsonResponse(simplejson.dumps(result, cls=ExtJSONEncoder))
 
+def JsonSuccess(context, *args, **kwargs):
+    context.update({'success': True})
+    return JsonResponse(simplejson.dumps(context, cls=ExtJSONEncoder), *args, **kwargs)
+
 def user_passes_test(test_func, login_url=None):
     """
     Decorator for views that checks that the user passes the given test,
