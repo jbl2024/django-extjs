@@ -203,11 +203,12 @@ class ExtJSONEncoder(DjangoJSONEncoder):
                 if dj == 'size':
                     v = o.field.widget.attrs.get(dj, None)
                     if v is not None:
+                        v = int(v)
                         if o.field.__class__ in (fields.DateField, fields.DateTimeField, fields.SplitDateTimeField, fields.TimeField):
                             v += 8
                         #Django's size attribute is the number of characters,
                         #so multiply by the pixel width of a character
-                        v = v * self.CHAR_PIXEL_WIDTH
+                        v *= self.CHAR_PIXEL_WIDTH
                 elif dj == 'hidden':
                     v = o.field.widget.attrs.get(dj, default_config.get('fieldHidden', ext[1]))
                 elif dj == 'name':

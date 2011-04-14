@@ -8,14 +8,14 @@ Ext.ux.DjangoForm = Ext.extend(Ext.FormPanel, {
     custom_config: null,
     default_config: null,
     showButtons: true,
-    showSuccessMessage: 'Formulaire bien enregistre',
+    showSuccessMessage: 'The data has been saved.',
     initComponent: function(){
         if (this.showButtons) {
             this.buttons = [{
                 name: 'submit',
                 xtype: 'button',
                 iconCls: 'icon-accept',
-                text: 'enregistrer',
+                text: 'Save',
                 scope: this,
                 handler: function(args){
                     this.submitForm();
@@ -24,7 +24,7 @@ Ext.ux.DjangoForm = Ext.extend(Ext.FormPanel, {
                 name: 'reset',
                 xtype: 'button',
                 iconCls: 'icon-cancel',
-                text: 'reset',
+                text: 'Reset',
                 scope: this,
                 handler: function(args){
                     this.resetForm();
@@ -75,6 +75,7 @@ Ext.ux.DjangoForm = Ext.extend(Ext.FormPanel, {
                     this.add(Ext.ComponentMgr.create(items[i]));
                 }
             }
+            this.doLayout();
             //finally callback your function when ready
             if (this.callback) {
                 this.callback.createDelegate(this.scope, [this])();
@@ -105,7 +106,7 @@ Ext.ux.DjangoForm = Ext.extend(Ext.FormPanel, {
         this.fireEvent('submitSuccess');
         if (this.showSuccessMessage) {
             Ext.Msg.show({
-                title: 'Succes',
+                title: 'Success',
                 msg: this.showSuccessMessage,
                 buttons: Ext.Msg.OK,
                 icon: Ext.MessageBox.INFO
@@ -116,8 +117,8 @@ Ext.ux.DjangoForm = Ext.extend(Ext.FormPanel, {
     
         this.fireEvent('submitError', msg);
         Ext.Msg.show({
-            title: 'Erreur',
-            msg: 'Impossible de valider : <br>' + msg + '<br>',
+            title: 'Error',
+            msg: 'Invalid: <br>' + msg + '<br>',
             buttons: Ext.Msg.OK,
             icon: Ext.MessageBox.WARNING
         });
@@ -140,8 +141,8 @@ Ext.ux.DjangoForm = Ext.extend(Ext.FormPanel, {
     invalid: function(){
         //    console.log('invalid: ', this.getForm().getValues());
         Ext.Msg.show({
-            title: 'Erreur',
-            msg: 'Impossible de valider : formulaire invalide',
+            title: 'Error',
+            msg: 'Invalid: please check all form fields are filled in & correct.',
             buttons: Ext.Msg.OK,
             icon: Ext.MessageBox.WARNING
         });
