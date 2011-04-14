@@ -1,4 +1,5 @@
 from django import forms
+from django.utils.text import capfirst
 
 CHAR_PIXEL_WIDTH = 8
 CHAR_PIXEL_HEIGHT = 15
@@ -34,6 +35,19 @@ class ExtJsForm(object):
         if getattr(self, 'ext_config', None):
             config_dict.update(self.ext_config)
         config_dict['items'] = self
+
+        submit = "Save"
+        reset = "Reset"
+
+        if hasattr(self, "Meta"):
+            if hasattr(self.Meta, "model"):
+                submit = "Save %s" % capfirst(self.Meta.model._meta.verbose_name)
+
+            submit = getattr(self.Meta, "submit", submit)
+            reset = getattr(self.Meta, "reset", reset)
+
+        config_dict['buttons'] = {'submit': submit, 'reset': reset}
+        
         return simplejson.dumps(config_dict, cls=utils.ExtJSONEncoder)
 
     @staticmethod

@@ -7,35 +7,19 @@ Ext.ux.DjangoForm = Ext.extend(Ext.FormPanel, {
     border: false,
     custom_config: null,
     default_config: null,
+    buttonToolbar: null,
     showButtons: true,
     showSuccessMessage: 'The data has been saved.',
+
     initComponent: function(){
-        if (this.showButtons) {
-            this.buttons = [{
-                name: 'submit',
-                xtype: 'button',
-                iconCls: 'icon-accept',
-                text: 'Save',
-                scope: this,
-                handler: function(args){
-                    this.submitForm();
-                }
-            }, {
-                name: 'reset',
-                xtype: 'button',
-                iconCls: 'icon-cancel',
-                text: 'Reset',
-                scope: this,
-                handler: function(args){
-                    this.resetForm();
-                }
-            }]
-        }
-        
         this.items = {
             border: false,
             'html': '<img style="vertical-align:middle" src="/media/extjs/resources/images/default/shared/large-loading.gif"/>&nbsp;&nbsp;&nbsp;&nbsp;loading...'
         }
+        if (this.showButtons) {
+            this.bbar = this.buttonToolbar = new Ext.Toolbar();
+        }
+
         this.getDefaultButton = function(name){
         
         }
@@ -75,6 +59,29 @@ Ext.ux.DjangoForm = Ext.extend(Ext.FormPanel, {
                     this.add(Ext.ComponentMgr.create(items[i]));
                 }
             }
+
+            if (this.showButtons) {
+                this.buttonToolbar.add([{
+                    name: 'reset',
+                    xtype: 'button',
+                    iconCls: 'icon-cancel',
+                    text: res.buttons.reset || "Reset",
+                    scope: this,
+                    handler: function(args){
+                        this.resetForm();
+                    }
+                },'->',{
+                    name: 'submit',
+                    xtype: 'button',
+                    iconCls: 'icon-accept',
+                    text: res.buttons.submit || "Save",
+                    scope: this,
+                    handler: function(args){
+                        this.submitForm();
+                    }
+                }]);
+            }
+
             this.doLayout();
             //finally callback your function when ready
             if (this.callback) {
