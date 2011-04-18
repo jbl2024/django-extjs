@@ -115,13 +115,13 @@ Ext.ux.DjangoForm = Ext.extend(Ext.FormPanel, {
                 // add custom form config to this formpanel
                 var newconf = this.custom_config.createDelegate(this, [this])();
                 for (var i = 0; i < newconf.items.length; i++) {
-                    this.add(Ext.ComponentMgr.create(newconf.items[i]));
+                    this.addField(newconf.items[i]);
                 }
                 
                 // auto add hidden fields from django form if needed
                 for (var i = 0; i < this.default_config.length; i++) {
                     if (this.default_config[i].xtype == 'hidden') {
-                        this.add(Ext.ComponentMgr.create(this.default_config[i]));
+                        this.addField(this.default_config[i]);
                     }
                 }
                 //this.default_config = res;
@@ -151,16 +151,16 @@ Ext.ux.DjangoForm = Ext.extend(Ext.FormPanel, {
                         Ext.each(fieldset[1].fields, function (field) {
                             fs_fields[fs_fields.length] = fields[field];
                         }, this);
-                        this.add(Ext.ComponentMgr.create({
+                        this.addField({
                             xtype: 'fieldset',
                             title: fieldset[0],
                             items: fs_fields
-                        }));
+                        });
                     }, this); 
                 } else {
                     //  Ext.apply(this, this.default_config);
                     Ext.iterate(this.fields, function (name, field) {
-                        this.add(Ext.ComponentMgr.create(field));
+                        this.addField(field);
                     }, this);
                 }
             }
@@ -207,6 +207,12 @@ Ext.ux.DjangoForm = Ext.extend(Ext.FormPanel, {
             success: this.gotFormCallback,
             failure: this.gotFormCallback
         });
+    },
+    addField: function(cfg) {
+        if (cfg.xtype && cfg.xtype == 'fileuploadfield') {
+            this.getForm().fileUpload = true;
+        }
+        return this.add(Ext.ComponentMgr.create(cfg));
     },
     submitSuccess: function(){
         this.fireEvent('submitSuccess');

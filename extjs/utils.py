@@ -89,6 +89,9 @@ class ExtJSONEncoder(DjangoJSONEncoder):
         'vtype':'url',
         'xtype': 'textfield'
     }
+    FILE_EDITOR = {
+        'xtype': 'fileuploadfield'
+    }
     CHAR_PIXEL_WIDTH = 8
 
     EXT_DEFAULT_CONFIG = {
@@ -116,6 +119,8 @@ class ExtJSONEncoder(DjangoJSONEncoder):
         fields.SplitDateTimeField: ["Ext.form.DateField", DATE_EDITOR],
         fields.TimeField: ["Ext.form.DateField", TIME_EDITOR],
         fields.URLField: ["Ext.form.TextField", URL_EDITOR],
+        fields.ImageField: ["Ext.ux.form.FileUploadField", FILE_EDITOR],
+        fields.FileField: ["Ext.ux.form.FileUploadField", FILE_EDITOR]
     }
 
     DJANGO_EXT_WIDGET_TYPES = {
@@ -375,11 +380,13 @@ class ExtJSONSerializer(JSONSerializer):
             self.objects["message"] = self.message
 
 def JsonResponse(content, *args, **kwargs):
-    return HttpResponse(content, mimetype='text/javascript', *args, **kwargs)
+    if kwargs.get('mimetype', None) is None:
+        kwargs['mimetype'] = "text/javascript"
+    return HttpResponse(content, *args, **kwargs)
 
-def JsonError(error = ''):
+def JsonError(error = '', *args, **kwargs):
     result = {"success": False, "msg": error }
-    return JsonResponse(simplejson.dumps(result, cls=ExtJSONEncoder))
+    return JsonResponse(simplejson.dumps(result, cls=ExtJSONEncoder), *args, **kwargs)
 
 def JsonSuccess(context=None, *args, **kwargs):
     if not context: context = {}
