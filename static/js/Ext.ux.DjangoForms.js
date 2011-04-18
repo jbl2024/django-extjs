@@ -139,23 +139,32 @@ Ext.ux.DjangoForm = Ext.extend(Ext.FormPanel, {
                 }
                 if (res.layout && res.layout.length > 0) {
                     Ext.each(res.layout, function (fieldset) {
-                        var fs_fields = [];
-                        if (fieldset[1].description) {
-                            fs_fields[fs_fields.length] = {
-                                html: fieldset[1].description,
-                                bodyCssClass: 'x-panel-fieldset-info',
-                                //style: 'padding-bottom:10px',
-                                border: true
-                            };
+                        if (fieldset[1] && fieldset[1] instanceof Object) {
+                            /* complex field formatting: [[title, {fields: [f1, f2, ..]}], [title, {fields: [f1, f2, ..]}] */
+                            var fs_fields = [];
+                            if (fieldset[1].description) {
+                                fs_fields[fs_fields.length] = {
+                                    html: fieldset[1].description,
+                                    bodyCssClass: 'x-panel-fieldset-info',
+                                    //style: 'padding-bottom:10px',
+                                    border: true
+                                };
+                            }
+                            Ext.each(fieldset[1].fields, function (field) {
+                                fs_fields[fs_fields.length] = fields[field];
+                            }, this);
+                            this.addField({
+                                xtype: 'fieldset',
+                                title: fieldset[0],
+                                items: fs_fields
+                            });
+                        } else {
+                            /* simple field list: [field, field, field, ..] */
+                            var fs_fields = [];
+                            Ext.each(fieldset, function (field) {
+                                this.addField(fields[field]);
+                            }, this);
                         }
-                        Ext.each(fieldset[1].fields, function (field) {
-                            fs_fields[fs_fields.length] = fields[field];
-                        }, this);
-                        this.addField({
-                            xtype: 'fieldset',
-                            title: fieldset[0],
-                            items: fs_fields
-                        });
                     }, this); 
                 } else {
                     //  Ext.apply(this, this.default_config);
