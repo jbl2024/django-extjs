@@ -139,6 +139,14 @@ Ext.ux.DjangoForm = Ext.extend(Ext.FormPanel, {
                 if (res.layout && res.layout.length > 0) {
                     Ext.each(res.layout, function (fieldset) {
                         var fs_fields = [];
+                        if (fieldset[1].description) {
+                            fs_fields[fs_fields.length] = {
+                                html: fieldset[1].description,
+                                bodyCssClass: 'x-panel-fieldset-info',
+                                //style: 'padding-bottom:10px',
+                                border: true
+                            };
+                        }
                         Ext.each(fieldset[1].fields, function (field) {
                             fs_fields[fs_fields.length] = fields[field];
                         }, this);
