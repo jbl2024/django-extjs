@@ -49,20 +49,45 @@ Ext.ux.DjangoForm = Ext.extend(Ext.FormPanel, {
     border: false,
     custom_config: null,
     default_config: null,
-    buttonToolbar: null,
     showButtons: true,
     showLoadMask: true,
     showSuccessMessage: 'The data has been saved.',
     fields: null,
     labelWidth: 160,
     maxFieldWidth: 400,
-
+    monitorValid: true,
+    
     initComponent: function(){
         this.items = {
             border: false
         }
         if (this.showButtons) {
-            this.bbar = this.buttonToolbar = new Ext.Toolbar();
+            this.resetButton = new Ext.Button({
+                hidden: true,
+                name: 'reset',
+                iconCls: 'icon-cancel',
+                text: "Reset",
+                scope: this,
+                handler: function(args){
+                    this.resetForm();
+                }
+            });
+            this.submitButton = new Ext.Button({
+                hidden: true,
+                name: 'submit',
+                iconCls: 'icon-accept',
+                text: "Submit",
+                scope: this,
+                formBind: true,
+                handler: function(args){
+                    this.submitForm();
+                }
+            });
+
+            this.buttonAlign = 'left';
+            this.buttons = [
+                this.resetButton, '->', this.submitButton
+            ];
         }
 
         this.getDefaultButton = function(name){
@@ -132,25 +157,10 @@ Ext.ux.DjangoForm = Ext.extend(Ext.FormPanel, {
             }
 
             if (this.showButtons) {
-                this.buttonToolbar.add([{
-                    name: 'reset',
-                    xtype: 'button',
-                    iconCls: 'icon-cancel',
-                    text: res.buttons.reset || "Reset",
-                    scope: this,
-                    handler: function(args){
-                        this.resetForm();
-                    }
-                },'->',{
-                    name: 'submit',
-                    xtype: 'button',
-                    iconCls: 'icon-accept',
-                    text: res.buttons.submit || "Save",
-                    scope: this,
-                    handler: function(args){
-                        this.submitForm();
-                    }
-                }]);
+                this.submitButton.setText(res.buttons.submit || this.submitButton.text);
+                this.resetButton.setText(res.buttons.reset || this.resetButton.text);
+                this.submitButton.setVisible(true);
+                this.resetButton.setVisible(true);
             }
 
             this.doLayout();
@@ -211,11 +221,9 @@ Ext.ux.DjangoForm = Ext.extend(Ext.FormPanel, {
         });
     },
     validResponse: function(form, action){
-        for (btn in this.buttons) {
-            var butt = this.buttons[btn];
-            if (butt.name == 'submit') 
-                butt.enable();
-        }
+        this.submitButton.enable();
+        this.resetButton.enable();
+
         if (action && action.result && action.result.success) {
             this.submitSuccess();
         }
@@ -240,11 +248,9 @@ Ext.ux.DjangoForm = Ext.extend(Ext.FormPanel, {
     submitForm: function(){
         //console.log('submitForm');
         if (this.getForm().isValid()) {
-            for (btn in this.buttons) {
-                if (this.buttons[btn].name == 'submit') {
-                    this.buttons[btn].disable();
-                }
-            }
+            this.submitButton.disable();
+            this.resetButton.disable();
+
             this.getForm().submit({
                 scope: this,
                 success: this.validResponse,
