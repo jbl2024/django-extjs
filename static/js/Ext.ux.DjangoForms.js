@@ -8,6 +8,38 @@ Ext.intercept(Ext.form.Field.prototype, 'initComponent', function() {
     }
 });
 
+Ext.ux.FieldHelp = Ext.extend(Object, (function(){
+    function syncInputSize(w, h) {
+        this.el.setSize(w, h);
+    }
+
+    function afterFieldRender() {
+        if (!this.wrap) {
+            this.wrap = this.el.wrap({cls: 'x-form-field-wrap'});
+            this.positionEl = this.resizeEl = this.wrap;
+            this.actionMode = 'wrap';
+            this.onResize = this.onResize.createSequence(syncInputSize);
+        }
+        this.wrap[this.helpAlign == 'top' ? 'insertFirst' : 'createChild']({
+            cls: 'x-form-helptext',
+            html: this.helpText
+        });
+    }
+
+    return {
+        constructor: function(t, align) {
+            this.helpText = t;
+            this.align = align;
+        },
+        init : function(f) {
+            f.helpAlign = this.align;
+            f.helpText = this.helpText;
+            f.afterRender = f.afterRender.createSequence(afterFieldRender);
+
+        }
+    };
+})());
+
 Ext.ux.DjangoForm = Ext.extend(Ext.FormPanel, {
     url: null,
     isLoaded: false,
@@ -46,6 +78,9 @@ Ext.ux.DjangoForm = Ext.extend(Ext.FormPanel, {
             Ext.each(res.items, function (field) {
                 if (field.width && field.width > this.maxFieldWidth) {
                     field.width = this.maxFieldWidth;
+                }
+                if (field.helpText) {
+                    Ext.apply(field, {plugins: [new Ext.ux.FieldHelp(field.helpText)]});
                 }
                 fields[field.name] = field;
             }, this);
