@@ -102,13 +102,11 @@ Ext.ux.DjangoForm = Ext.extend(Ext.FormPanel, {
         Ext.ux.DjangoForm.superclass.initComponent.apply(this, arguments);
 
         this.on('render', function () {
-            if (!this.isLoaded && this.showLoadMask) {
+            if (!this.isLoaded && this.showLoadMask && this.ownerCt) {
                 this.loadMask = new Ext.LoadMask(this.ownerCt.body, {msg:"Please wait..."});
                 this.loadMask.show();
             }
         }, this);
-
-
         
         this.addEvents('submitSuccess', 'submitError');
         
