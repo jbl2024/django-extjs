@@ -2,9 +2,9 @@
 Ext.intercept(Ext.form.Field.prototype, 'initComponent', function() {
     var fl = this.fieldLabel, ab = this.allowBlank;
     if (ab === false && fl) {
-        this.fieldLabel = '  ' + fl + ' <span style="color:red;">*</span>';
+        this.fieldLabel = '&nbsp;&nbsp;' + fl + ' <span style="color:red;">*</span>';
     } else if (ab === true && fl) {
-        this.fieldLabel = '  ' + fl;
+        this.fieldLabel = '&nbsp;&nbsp;' + fl;
     }
 });
 
