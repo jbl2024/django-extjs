@@ -36,7 +36,7 @@ class ExtJsForm(object):
             config_dict.update(self.ext_config)
         config_dict['items'] = self
 
-        submit = "Save"
+        submit = "Submit"
         reset = "Reset"
 
         if hasattr(self, "Meta"):
