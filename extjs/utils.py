@@ -44,6 +44,7 @@ class ExtJSONEncoder(DjangoJSONEncoder):
 
     CHECKBOX_EDITOR = {
         'xtype': 'checkbox',
+        'hideLabel': True
     }
     COMBO_EDITOR = {
         'listWidth': 'auto',
@@ -135,6 +136,7 @@ class ExtJSONEncoder(DjangoJSONEncoder):
         'help_text': ['helpText', None],
         'initial': ['value', None],
         'label': ['fieldLabel', None],
+        'boxlabel': ['boxLabel', None],
         'max_length': ['maxLength', None],
         'max_value': ['maxValue', None],
         'min_value': ['minValue', None],
@@ -237,6 +239,16 @@ class ExtJSONEncoder(DjangoJSONEncoder):
                             v = capfirst(o.field.name.replace("_", " "))
                         else:
                             v = force_unicode(v)
+                elif dj == 'boxlabel':
+                    if isinstance(o.field, fields.BooleanField):
+                        v = o.field.widget.attrs.get(dj, None)
+                        if v is None:
+                            v = getattr(o.field, 'label', None)
+                            if v is None:
+                                v = capfirst(o.field.name.replace("_", " "))
+                            else:
+                                v = force_unicode(v)
+                        v = v + u'?'
                 elif getattr(o.field, dj, ext[1]) is None:
                     pass
                 elif isinstance(ext[1], basestring):
