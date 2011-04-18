@@ -1,6 +1,7 @@
 // dynamic load of a server side form
 Ext.ux.DjangoForm = Ext.extend(Ext.FormPanel, {
     url: null,
+    isLoaded: false,
     baseParamsLoad: null,
     callback: null,
     scope: null,
@@ -9,12 +10,12 @@ Ext.ux.DjangoForm = Ext.extend(Ext.FormPanel, {
     default_config: null,
     buttonToolbar: null,
     showButtons: true,
+    showLoadMask: true,
     showSuccessMessage: 'The data has been saved.',
 
     initComponent: function(){
         this.items = {
-            border: false,
-            'html': '<img style="vertical-align:middle" src="/media/extjs/resources/images/default/shared/large-loading.gif"/>&nbsp;&nbsp;&nbsp;&nbsp;loading...'
+            border: false
         }
         if (this.showButtons) {
             this.bbar = this.buttonToolbar = new Ext.Toolbar();
@@ -83,6 +84,11 @@ Ext.ux.DjangoForm = Ext.extend(Ext.FormPanel, {
             }
 
             this.doLayout();
+
+            if (this.showLoadMask) {
+                this.loadMask.hide();
+            }
+
             //finally callback your function when ready
             if (this.callback) {
                 this.callback.createDelegate(this.scope, [this])();
@@ -94,6 +100,15 @@ Ext.ux.DjangoForm = Ext.extend(Ext.FormPanel, {
             Ext.apply(o, this.baseParamsLoad);
         
         Ext.ux.DjangoForm.superclass.initComponent.apply(this, arguments);
+
+        this.on('render', function () {
+            if (!this.isLoaded && this.showLoadMask) {
+                this.loadMask = new Ext.LoadMask(this.ownerCt.body, {msg:"Please wait..."});
+                this.loadMask.show();
+            }
+        }, this);
+
+
         
         this.addEvents('submitSuccess', 'submitError');
         
@@ -105,9 +120,6 @@ Ext.ux.DjangoForm = Ext.extend(Ext.FormPanel, {
             success: this.gotFormCallback,
             failure: this.gotFormCallback
         });
-        
-        
-        
     },
     submitSuccess: function(){
         this.fireEvent('submitSuccess');
