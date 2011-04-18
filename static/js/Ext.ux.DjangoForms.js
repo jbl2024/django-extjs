@@ -56,7 +56,8 @@ Ext.ux.DjangoForm = Ext.extend(Ext.FormPanel, {
     labelWidth: 160,
     maxFieldWidth: 400,
     monitorValid: true,
-    
+    resetOnSave: true,
+
     initComponent: function(){
         this.items = {
             border: false
@@ -216,6 +217,9 @@ Ext.ux.DjangoForm = Ext.extend(Ext.FormPanel, {
                 buttons: Ext.Msg.OK,
                 icon: Ext.MessageBox.INFO
             });
+        }
+        if (this.resetOnSave) {
+            this.resetForm();
         }
     },
     submitError: function(msg){
