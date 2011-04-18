@@ -1,4 +1,13 @@
 // dynamic load of a server side form
+Ext.intercept(Ext.form.Field.prototype, 'initComponent', function() {
+    var fl = this.fieldLabel, ab = this.allowBlank;
+    if (ab === false && fl) {
+        this.fieldLabel = '  ' + fl + ' <span style="color:red;">*</span>';
+    } else if (ab === true && fl) {
+        this.fieldLabel = '  ' + fl;
+    }
+});
+
 Ext.ux.DjangoForm = Ext.extend(Ext.FormPanel, {
     url: null,
     isLoaded: false,
@@ -13,6 +22,8 @@ Ext.ux.DjangoForm = Ext.extend(Ext.FormPanel, {
     showLoadMask: true,
     showSuccessMessage: 'The data has been saved.',
     fields: null,
+    labelWidth: 160,
+    maxFieldWidth: 400,
 
     initComponent: function(){
         this.items = {
@@ -33,6 +44,9 @@ Ext.ux.DjangoForm = Ext.extend(Ext.FormPanel, {
             /* save the fields */
             var fields = this.fields = {};
             Ext.each(res.items, function (field) {
+                if (field.width && field.width > this.maxFieldWidth) {
+                    field.width = this.maxFieldWidth;
+                }
                 fields[field.name] = field;
             }, this);
 
@@ -68,18 +82,17 @@ Ext.ux.DjangoForm = Ext.extend(Ext.FormPanel, {
                         Ext.each(fieldset[1].fields, function (field) {
                             fs_fields[fs_fields.length] = fields[field];
                         }, this);
-                        this.add({
+                        this.add(Ext.ComponentMgr.create({
                             xtype: 'fieldset',
                             title: fieldset[0],
                             items: fs_fields
-                        });
+                        }));
                     }, this); 
                 } else {
                     //  Ext.apply(this, this.default_config);
-                    items = res.items;
-                    for (var i = 0; i < items.length; i++) {
-                        this.add(Ext.ComponentMgr.create(items[i]));
-                    }
+                    Ext.iterate(this.fields, function (name, field) {
+                        this.add(Ext.ComponentMgr.create(field));
+                    }, this);
                 }
             }
 
