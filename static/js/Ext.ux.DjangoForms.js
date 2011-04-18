@@ -12,6 +12,7 @@ Ext.ux.DjangoForm = Ext.extend(Ext.FormPanel, {
     showButtons: true,
     showLoadMask: true,
     showSuccessMessage: 'The data has been saved.',
+    fields: null,
 
     initComponent: function(){
         this.items = {
@@ -28,6 +29,13 @@ Ext.ux.DjangoForm = Ext.extend(Ext.FormPanel, {
             var res = Ext.decode(response.responseText);
             this.default_config = res;
             this.removeAll();
+
+            /* save the fields */
+            var fields = this.fields = {};
+            Ext.each(res.items, function (field) {
+                fields[field.name] = field;
+            }, this);
+
             if (this.custom_config) {
                 // add custom form config to this formpanel
                 var newconf = this.custom_config.createDelegate(this, [this])();
@@ -54,10 +62,24 @@ Ext.ux.DjangoForm = Ext.extend(Ext.FormPanel, {
                 if (this.startItems) {
                     this.add(this.startItems);
                 }
-                //  Ext.apply(this, this.default_config);
-				items = res.items;
-                for (var i = 0; i < items.length; i++) {
-                    this.add(Ext.ComponentMgr.create(items[i]));
+                if (res.layout && res.layout.length > 0) {
+                    Ext.each(res.layout, function (fieldset) {
+                        var fs_fields = [];
+                        Ext.each(fieldset[1].fields, function (field) {
+                            fs_fields[fs_fields.length] = fields[field];
+                        }, this);
+                        this.add({
+                            xtype: 'fieldset',
+                            title: fieldset[0],
+                            items: fs_fields
+                        });
+                    }, this); 
+                } else {
+                    //  Ext.apply(this, this.default_config);
+                    items = res.items;
+                    for (var i = 0; i < items.length; i++) {
+                        this.add(Ext.ComponentMgr.create(items[i]));
+                    }
                 }
             }
 

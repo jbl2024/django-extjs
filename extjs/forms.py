@@ -42,7 +42,10 @@ class ExtJsForm(object):
         if hasattr(self, "Meta"):
             if hasattr(self.Meta, "model"):
                 submit = "Save %s" % capfirst(self.Meta.model._meta.verbose_name)
-
+            if hasattr(self.Meta, "fields"):
+                config_dict['layout'] = self.Meta.fields
+            if hasattr(self.Meta, "fieldsets"):
+                config_dict['layout'] = self.Meta.fieldsets
             submit = getattr(self.Meta, "submit", submit)
             reset = getattr(self.Meta, "reset", reset)
 
