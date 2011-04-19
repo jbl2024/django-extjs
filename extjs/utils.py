@@ -393,6 +393,9 @@ def JsonSuccess(context=None, *args, **kwargs):
     context.update({'success': True})
     return JsonResponse(simplejson.dumps(context, cls=ExtJSONEncoder), *args, **kwargs)
 
+def JsonSerialize(content):
+    return simplejson.dumps(content, cls=ExtJSONEncoder)
+
 def user_passes_test(test_func, login_url=None):
     """
     Decorator for views that checks that the user passes the given test,
