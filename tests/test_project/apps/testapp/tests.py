@@ -656,7 +656,7 @@ class OtherTests(TestCase):
         response = self.client.get(reverse('test_decorator'))
         rsp = {"success" : False, 'errorMsg': 'not connected', 'notConnected': True}
         result = simplejson.dumps(rsp, cls=ExtJSONEncoder)
-        self.assertTrue("Content-Type: text/javascript" in str(response))
+        self.assertTrue("Content-Type: application/json" in str(response))
         self.assertTrue(result in response.content)
         self.client.login(username="extjs", password="extjs")
         response = self.client.get(reverse('test_decorator'))
