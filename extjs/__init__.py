@@ -14,7 +14,7 @@ def register(form, ):
     """
     from django.utils.translation import ugettext as _
 
-    from extjs.forms import ExtJsForm
+    from forms import ExtJsForm
 
     if form in registry:
         raise AlreadyRegistered(

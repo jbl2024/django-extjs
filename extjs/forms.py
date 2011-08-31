@@ -1,4 +1,5 @@
 from django import forms
+from django.utils.text import capfirst
 
 CHAR_PIXEL_WIDTH = 8
 CHAR_PIXEL_HEIGHT = 15
@@ -22,8 +23,8 @@ class ExtJsForm(object):
         cls.as_extjsdata = self.as_extjsdata
         cls.html_errorlist = self.html_errorlist
         # default submit handler
-        handler_submit = "function(btn) {console.log(this, btn);this.findParentByType(this.form_xtype).submitForm()}"
-        handler_reset = "function(btn) {console.log(this, btn);this.findParentByType(this.form_xtype).resetForm()}"
+        handler_submit = "function(btn) {this.findParentByType(this.form_xtype).submitForm()}"
+        handler_reset = "function(btn) {this.findParentByType(this.form_xtype).resetForm()}"
         cls.ext_baseConfig = {
         }
 
@@ -34,6 +35,22 @@ class ExtJsForm(object):
         if getattr(self, 'ext_config', None):
             config_dict.update(self.ext_config)
         config_dict['items'] = self
+
+        submit = "Submit"
+        reset = "Reset"
+
+        if hasattr(self, "Meta"):
+            if hasattr(self.Meta, "model"):
+                submit = "Save %s" % capfirst(self.Meta.model._meta.verbose_name)
+            if hasattr(self.Meta, "fields"):
+                config_dict['layout'] = self.Meta.fields
+            if hasattr(self.Meta, "fieldsets"):
+                config_dict['layout'] = self.Meta.fieldsets
+            submit = getattr(self.Meta, "submit", submit)
+            reset = getattr(self.Meta, "reset", reset)
+
+        config_dict['buttons'] = {'submit': submit, 'reset': reset}
+        
         return simplejson.dumps(config_dict, cls=utils.ExtJSONEncoder)
 
     @staticmethod
