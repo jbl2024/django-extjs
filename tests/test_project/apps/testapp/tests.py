@@ -633,6 +633,9 @@ class QueryFromRequestTest(TestCase):
         result_qr = wg.query_from_request(self.request, qr, fields=['atitle'])
         self.assertEqual(list(result_qr), [wam3])
 
+        result_qr = wg.query_from_request(self.request, qr, fields={'atitle':'author__title'})
+        self.assertEqual(list(result_qr), [wam3])
+
 class OtherTests(TestCase):
     """Other tests
     """
