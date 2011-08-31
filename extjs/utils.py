@@ -9,6 +9,7 @@ from django.forms.models import ModelChoiceField, ModelMultipleChoiceField
 from django.forms.forms import BoundField
 from django.http import Http404, HttpResponse, HttpResponseRedirect, HttpResponseNotFound
 from django.core.serializers.json import Serializer as JSONSerializer
+from django.utils.text import capfirst
 import simplejson
 from django.utils.functional import Promise
 from django.utils.encoding import force_unicode
@@ -16,7 +17,21 @@ from django.shortcuts import get_object_or_404
 
 
 from django.http import HttpResponseRedirect
-from django.utils.decorators import available_attrs
+try:
+    from django.utils.decorators import available_attrs
+except ImportError:
+    # django 1.1
+    try:
+        from functools import wraps, update_wrapper, WRAPPER_ASSIGNMENTS
+    except ImportError:
+        from django.utils.functional import wraps, update_wrapper, WRAPPER_ASSIGNMENTS  # Python 2.4 fallback.
+    def available_attrs(fn):
+        """
+        Return the list of functools-wrappable attributes on a callable.
+        This is required as a workaround for http://bugs.python.org/issue3445.
+        """
+        return tuple(a for a in WRAPPER_ASSIGNMENTS if hasattr(fn, a))
+
 try:
     from functools import update_wrapper, wraps
 except ImportError:
@@ -29,6 +44,7 @@ class ExtJSONEncoder(DjangoJSONEncoder):
 
     CHECKBOX_EDITOR = {
         'xtype': 'checkbox',
+        'hideLabel': True
     }
     COMBO_EDITOR = {
         'listWidth': 'auto',
@@ -73,6 +89,9 @@ class ExtJSONEncoder(DjangoJSONEncoder):
         'vtype':'url',
         'xtype': 'textfield'
     }
+    FILE_EDITOR = {
+        'xtype': 'fileuploadfield'
+    }
     CHAR_PIXEL_WIDTH = 8
 
     EXT_DEFAULT_CONFIG = {
@@ -84,6 +103,7 @@ class ExtJSONEncoder(DjangoJSONEncoder):
     DJANGO_EXT_FIELD_TYPES = {
         fields.BooleanField: ["Ext.form.Checkbox", CHECKBOX_EDITOR],
         fields.CharField: ["Ext.form.TextField", TEXT_EDITOR],
+        fields.IPAddressField: ["Ext.form.TextField", TEXT_EDITOR],
         fields.SlugField: ["Ext.form.TextField", TEXT_EDITOR],
         fields.ChoiceField: ["Ext.form.ComboBox", COMBO_EDITOR],
         fields.TypedChoiceField: ["Ext.form.ComboBox", COMBO_EDITOR],
@@ -99,6 +119,8 @@ class ExtJSONEncoder(DjangoJSONEncoder):
         fields.SplitDateTimeField: ["Ext.form.DateField", DATE_EDITOR],
         fields.TimeField: ["Ext.form.DateField", TIME_EDITOR],
         fields.URLField: ["Ext.form.TextField", URL_EDITOR],
+        fields.ImageField: ["Ext.ux.form.FileUploadField", FILE_EDITOR],
+        fields.FileField: ["Ext.ux.form.FileUploadField", FILE_EDITOR]
     }
 
     DJANGO_EXT_WIDGET_TYPES = {
@@ -119,6 +141,7 @@ class ExtJSONEncoder(DjangoJSONEncoder):
         'help_text': ['helpText', None],
         'initial': ['value', None],
         'label': ['fieldLabel', None],
+        'boxlabel': ['boxLabel', None],
         'max_length': ['maxLength', None],
         'max_value': ['maxValue', None],
         'min_value': ['minValue', None],
@@ -180,20 +203,20 @@ class ExtJSONEncoder(DjangoJSONEncoder):
                     default_config.update(self.DJANGO_EXT_WIDGET_TYPES[o.field.widget.__class__][1])
                 
             else:
-                default_config.update(self.EXT_DEFAULT_CONFIG['editor'])
+                default_config.update(self.EXT_DEFAULT_CONFIG)
             config = deepcopy(default_config)
             for dj, ext in self.DJANGO_EXT_FIELD_ATTRS.items():
                 v = None
 
                 # Adapt the value with type of field
                 if dj == 'size':
-                    v = o.field.widget.attrs.get(dj, None)
-                    if v is not None:
-                        if o.field.__class__ in (fields.DateField, fields.DateTimeField, fields.SplitDateTimeField, fields.TimeField):
-                            v += 8
-                        #Django's size attribute is the number of characters,
+                    max_length = getattr(o.field, 'max_length', None)
+                    if max_length is not None and type(max_length) is int:
+                        #if o.field.__class__ in (fields.DateField, fields.DateTimeField, fields.SplitDateTimeField, fields.TimeField):
+                        #    v += 8
+                        #Django's max_length attribute is the number of characters,
                         #so multiply by the pixel width of a character
-                        v = v * self.CHAR_PIXEL_WIDTH
+                        v = max_length * self.CHAR_PIXEL_WIDTH
                 elif dj == 'hidden':
                     v = o.field.widget.attrs.get(dj, default_config.get('fieldHidden', ext[1]))
                 elif dj == 'name':
@@ -218,9 +241,19 @@ class ExtJSONEncoder(DjangoJSONEncoder):
                     if v is None:
                         v = getattr(o.field, 'label', None)
                         if v is None:
-                            v = o.field.name
+                            v = capfirst(o.field.name.replace("_", " "))
                         else:
                             v = force_unicode(v)
+                elif dj == 'boxlabel':
+                    if isinstance(o.field, fields.BooleanField):
+                        v = o.field.widget.attrs.get(dj, None)
+                        if v is None:
+                            v = getattr(o.field, 'label', None)
+                            if v is None:
+                                v = capfirst(o.field.name.replace("_", " "))
+                            else:
+                                v = force_unicode(v)
+                        v = v + u'?'
                 elif getattr(o.field, dj, ext[1]) is None:
                     pass
                 elif isinstance(ext[1], basestring):
@@ -347,11 +380,21 @@ class ExtJSONSerializer(JSONSerializer):
             self.objects["message"] = self.message
 
 def JsonResponse(content, *args, **kwargs):
-    return HttpResponse(content, mimetype='application/json', *args, **kwargs)
+    if kwargs.get('mimetype', None) is None:
+        kwargs['mimetype'] = "text/json"
+    return HttpResponse(content, *args, **kwargs)
 
-def JsonError(error = ''):
+def JsonError(error = '', *args, **kwargs):
     result = {"success": False, "msg": error }
-    return JsonResponse(simplejson.dumps(result, cls=ExtJSONEncoder))
+    return JsonResponse(simplejson.dumps(result, cls=ExtJSONEncoder), *args, **kwargs)
+
+def JsonSuccess(context=None, *args, **kwargs):
+    if not context: context = {}
+    context.update({'success': True})
+    return JsonResponse(simplejson.dumps(context, cls=ExtJSONEncoder), *args, **kwargs)
+
+def JsonSerialize(content):
+    return simplejson.dumps(content, cls=ExtJSONEncoder)
 
 def user_passes_test(test_func, login_url=None):
     """
