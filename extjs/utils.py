@@ -381,7 +381,7 @@ class ExtJSONSerializer(JSONSerializer):
 
 def JsonResponse(content, *args, **kwargs):
     if kwargs.get('mimetype', None) is None:
-        kwargs['mimetype'] = "text/json"
+        kwargs['mimetype'] = "application/json"
     return HttpResponse(content, *args, **kwargs)
 
 def JsonError(error = '', *args, **kwargs):

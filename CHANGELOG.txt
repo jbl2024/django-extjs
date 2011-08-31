@@ -26,3 +26,6 @@
 
     * Thanks to : Chris Rose
 
+    TODO :
+
+    * Fix 'extjs.utils.extjs_login_required' decorator on django 1.1

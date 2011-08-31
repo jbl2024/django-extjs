@@ -20,11 +20,13 @@ class FormsTestCase(TestCase):
         """
         cf = ContactForm()
         expct = {"items":[
-            {'fieldLabel': 'subject', 'xtype': 'textfield', 'fieldHidden': False, 'name': 'subject', 'header': 'subject', 'helpText': '', 'maxLength': 100, 'allowBlank': False},
-            {'fieldLabel': 'message', 'xtype': 'textfield', 'fieldHidden': False, 'value': 'pony', 'name': 'message', 'header': 'message', 'helpText': '', 'allowBlank': False},
-            {'vtype': 'email', 'fieldLabel': 'sender', 'allowBlank': False, 'fieldHidden': False, 'name': 'sender', 'header': 'sender', 'helpText': '', 'xtype': 'textfield'},
-            {'fieldLabel': 'cc_myself', 'xtype': 'checkbox', 'fieldHidden': False, 'value': False, 'name': 'cc_myself', 'header': 'cc_myself', 'helpText': '', 'allowBlank': True, 'checked': False},
-        ]}
+            {'fieldLabel': 'Subject', 'xtype': 'textfield', 'fieldHidden': False, 'name': 'subject', 'header': 'subject', 'helpText': '', 'maxLength': 100, 'allowBlank': False, "width": 800},
+            {'fieldLabel': 'Message', 'xtype': 'textfield', 'fieldHidden': False, 'value': 'pony', 'name': 'message', 'header': 'message', 'helpText': '', 'allowBlank': False},
+            {'vtype': 'email', 'fieldLabel': 'Sender', 'allowBlank': False, 'fieldHidden': False, 'name': 'sender', 'header': 'sender', 'helpText': '', 'xtype': 'textfield'},
+            {'fieldLabel': 'Cc myself', 'xtype': 'checkbox', 'fieldHidden': False, 'value': False, 'name': 'cc_myself', 'header': 'cc_myself', 'helpText': '', 'allowBlank': True, 'checked': False, 'boxLabel': 'Cc myself?', 'hideLabel': True,},
+            ],
+            'buttons': {'reset': 'Reset', 'submit': 'Submit'},
+        }
         result = simplejson.loads(cf.as_extjs())
         self.assertEqual(expct, result)
         cf = ContactForm({'subject':'PONY', 'cc_myself':True})
@@ -42,10 +44,12 @@ class FormsTestCase(TestCase):
         """
         cf = AuthorForm()
         expct = {"items":[
-            {"fieldLabel": "Name", "xtype": "textfield", "fieldHidden": False, "header": "name", "allowBlank": False, "helpText": "", "maxLength": 100, "name": "name", "value": "Platon"},
+            {"fieldLabel": "Name", "xtype": "textfield", "fieldHidden": False, "header": "name", "allowBlank": False, "helpText": "", "maxLength": 100, "name": "name", "value": "Platon", "width": 800},
             {"xtype": "combo", "forceSelection": True, "editable": False, "triggerAction": 'all', "hiddenName": "title", "fieldLabel": "Title", "name": "title", "header": "title", "fieldHidden": False, "value": "", "width": 150, "allowBlank": False, "helpText": "", "mode": "local", "store": [["", "---------"], ["MR", "Mr."], ["MRS", "Mrs."], ["MS", "Ms."]], "listWidth": "auto"},
             {"fieldLabel": "Birth date", "allowBlank": True, "fieldHidden": False, "name": "birth_date", "header": "birth_date", "helpText": "", "xtype": "datefield"}
-            ]}
+            ],
+            'buttons': {'reset': 'Reset', 'submit': 'Save Author'},
+        }
         self.assertEqual(expct, simplejson.loads(cf.as_extjs()))
 
         # With POST data
@@ -66,15 +70,17 @@ class FormsTestCase(TestCase):
         """
         cf = WhatamessForm()
         expct = {"items":[
-            {"fieldLabel": "Name", "xtype": "textfield", "fieldHidden": False, "header": "name", "allowBlank": False, "helpText": "", "maxLength": 100, "name": "name"},
+            {"fieldLabel": "Name", "xtype": "textfield", "fieldHidden": False, "header": "name", "allowBlank": False, "helpText": "", "maxLength": 100, "name": "name", "width": 800},
             {"fieldLabel": "Number", "allowBlank": False, "fieldHidden": False, "name": "number", "header": "number", "helpText": "", "xtype": "numberfield"},
-            {"fieldLabel": "Slug", "xtype": "textfield", "fieldHidden": False, "header": "slug", "allowBlank": False, "helpText": "", "maxLength": 50, "name": "slug"},
+            {"fieldLabel": "Slug", "xtype": "textfield", "fieldHidden": False, "header": "slug", "allowBlank": False, "helpText": "", "maxLength": 50, "name": "slug", 'width': 400},
             {"fieldLabel": "Text", "allowBlank": False, "fieldHidden": False, "name": "text", "header": "text", "helpText": "", "xtype": "textarea"},
             {"xtype": "combo", "forceSelection": True, "editable": False, "triggerAction": 'all', "hiddenName": "author", "fieldLabel": "Author", "name": "author", "header": "author", "fieldHidden": False, "value": "", "width": 150, "allowBlank": True, "helpText": "", "mode": "local", "store": [["", "---------"]], "listWidth": "auto"},
             {"xtype": "combo", "forceSelection": True, "editable": False, "triggerAction": 'all', "hiddenName": "title", "fieldLabel": "Title", "name": "title", "header": "title", "fieldHidden": False, "value": "", "width": 150, "allowBlank": False, "helpText": "", "mode": "local", "store": [["", "---------"], ["1", "Mr."], ["2", "Mrs."], ["3", "Ms."]], "listWidth": "auto"},
             {"fieldLabel": "Birth date", "allowBlank": True, "fieldHidden": False, "name": "birth_date", "header": "birth_date", "helpText": "", "xtype": "datefield"},
-            {"fieldLabel": "Yesno", "xtype": "checkbox", "fieldHidden": False, "value": False, "header": "yesno", "allowBlank": True, "helpText": "", "name": "yesno", 'checked': False}
-            ]}
+            {"fieldLabel": "Yesno", "xtype": "checkbox", "fieldHidden": False, "value": False, "header": "yesno", "allowBlank": True, "helpText": "", "name": "yesno", 'checked': False, 'boxLabel': 'Yesno?', 'hideLabel': True,}
+            ],
+            'buttons': {'reset': 'Reset', 'submit': 'Save Whatamess'},
+        }
         self.assertEqual(expct, simplejson.loads(cf.as_extjs()))
 
     def testModelFormcomplexFK(self):
@@ -83,7 +89,10 @@ class FormsTestCase(TestCase):
         cf = WhatamessFormFK()
         expct = {"items":[
             {"xtype": "combo", "forceSelection": True, "editable": False, "triggerAction": 'all', "hiddenName": "author", "fieldLabel": "Author", "name": "author", "header": "author", "fieldHidden": False, "value": "", "width": 150, "allowBlank": True, "helpText": "", "mode": "local", "store": [["", "---------"]], "listWidth": "auto"},
-            ]}
+            ],
+            'buttons': {'reset': 'Reset', 'submit': 'Save Whatamess'},
+            'layout': ['author']
+        }
         self.assertEqual(expct, simplejson.loads(cf.as_extjs()))
 
     def testModelFormexcludebasic(self):
@@ -91,9 +100,11 @@ class FormsTestCase(TestCase):
         """
         cf = AuthorxcludeForm()
         expct = {"items":[
-            {"fieldLabel": "Name", "xtype": "textfield", "fieldHidden": False, "header": "name", "allowBlank": False, "helpText": "", "maxLength": 100, "name": "name", "value": "Platon"},
+            {"fieldLabel": "Name", "xtype": "textfield", "fieldHidden": False, "header": "name", "allowBlank": False, "helpText": "", "maxLength": 100, "name": "name", "value": "Platon", "width": 800},
             {"fieldLabel": "Birth date", "allowBlank": True, "fieldHidden": False, "name": "birth_date", "header": "birth_date", "helpText": "", "xtype": "datefield"}
-            ]}
+            ],
+            'buttons': {'reset': 'Reset', 'submit': 'Save Author'},
+        }
         self.assertEqual(expct, simplejson.loads(cf.as_extjs()))
 
     def testModelFormComplexwithAuthor(self):
@@ -103,15 +114,17 @@ class FormsTestCase(TestCase):
         auth1 = Author.objects.create(name="toto", title="ToTo", birth_date=date(2000,1,2))
         cf = WhatamessForm()
         expct = {"items":[
-            {"fieldLabel": "Name", "xtype": "textfield", "fieldHidden": False, "header": "name", "allowBlank": False, "helpText": "", "maxLength": 100, "name": "name"},
+            {"fieldLabel": "Name", "xtype": "textfield", "fieldHidden": False, "header": "name", "allowBlank": False, "helpText": "", "maxLength": 100, "name": "name", "width": 800},
             {"fieldLabel": "Number", "allowBlank": False, "fieldHidden": False, "name": "number", "header": "number", "helpText": "", "xtype": "numberfield"},
-            {"fieldLabel": "Slug", "xtype": "textfield", "fieldHidden": False, "header": "slug", "allowBlank": False, "helpText": "", "maxLength": 50, "name": "slug"},
+            {"fieldLabel": "Slug", "xtype": "textfield", "fieldHidden": False, "header": "slug", "allowBlank": False, "helpText": "", "maxLength": 50, "name": "slug", "width": 400},
             {"fieldLabel": "Text", "allowBlank": False, "fieldHidden": False, "name": "text", "header": "text", "helpText": "", "xtype": "textarea"},
             {"xtype": "combo", "forceSelection": True, "editable": False, "triggerAction": 'all', "hiddenName": "author", "fieldLabel": "Author", "name": "author", "header": "author", "fieldHidden": False, "value": "", "width": 150, "allowBlank": True, "helpText": "", "mode": "local", "store": [["", "---------"], ['1', 'toto'],], "listWidth": "auto"},
             {"xtype": "combo", "forceSelection": True, "editable": False, "triggerAction": 'all', "hiddenName": "title", "fieldLabel": "Title", "name": "title", "header": "title", "fieldHidden": False, "value": "", "width": 150, "allowBlank": False, "helpText": "", "mode": "local", "store": [["", "---------"], ["1", "Mr."], ["2", "Mrs."], ["3", "Ms."]], "listWidth": "auto"},
             {"fieldLabel": "Birth date", "allowBlank": True, "fieldHidden": False, "name": "birth_date", "header": "birth_date", "helpText": "", "xtype": "datefield"},
-            {"fieldLabel": "Yesno", "xtype": "checkbox", "fieldHidden": False, "value": False, "header": "yesno", "allowBlank": True, "helpText": "", "name": "yesno", 'checked': False}
-            ]}
+            {"fieldLabel": "Yesno", "xtype": "checkbox", "fieldHidden": False, "value": False, "header": "yesno", "allowBlank": True, "helpText": "", "name": "yesno", 'checked': False, 'boxLabel': 'Yesno?', 'hideLabel': True,}
+            ],
+            'buttons': {'reset': 'Reset', 'submit': 'Save Whatamess'},
+        }
         self.assertEqual(expct, simplejson.loads(cf.as_extjs()))
 
     def testFormI18N(self):
@@ -119,8 +132,10 @@ class FormsTestCase(TestCase):
         """
         cf = I18nForm()
         expct = {"items":[
-            {'fieldLabel': 'Subject', 'xtype': 'textfield', 'fieldHidden': False, 'name': 'subject', 'header': 'subject', 'helpText': '', 'maxLength': 100, 'allowBlank': False},
-        ]}
+            {'fieldLabel': 'Subject', 'xtype': 'textfield', 'fieldHidden': False, 'name': 'subject', 'header': 'subject', 'helpText': '', 'maxLength': 100, 'allowBlank': False, "width": 800},
+            ],
+            'buttons': {'reset': 'Reset', 'submit': 'Submit'},
+        }
         self.assertEqual(expct, simplejson.loads(cf.as_extjs()))
 
 class FormsDataTestCase(TestCase):
@@ -196,27 +211,30 @@ class FormsDataTestCase(TestCase):
         wam1 = Whatamess.objects.create(name="toto", title=1, birth_date=date(2000,1,2), yesno=True, number=1)
         cf = WhatamessForm(instance=wam1)
         expct = {"items":[
-            {"fieldLabel": "Name", "xtype": "textfield", "fieldHidden": False, "header": "name", "allowBlank": False, "helpText": "", "maxLength": 100, "name": "name", "value": "toto"},
-            {"fieldLabel": "Number", "allowBlank": False, "fieldHidden": False, "name": "number", "header": "number", "helpText": "", "xtype": "numberfield", "value": 1},
-            {"fieldLabel": "Slug", "xtype": "textfield", "fieldHidden": False, "header": "slug", "allowBlank": False, "helpText": "", "maxLength": 50, "name": "slug", "value": ""},
+            {"fieldLabel": "Name", "xtype": "textfield", "fieldHidden": False, "header": "name", "allowBlank": False, "helpText": "", "maxLength": 100, "name": "name", "width": 800, "value": "toto"},
+            {"fieldLabel": "Number", "allowBlank": False, "fieldHidden": False, "name": "number", "header": "number", "helpText": "", "xtype": "numberfield", "value":1},
+            {"fieldLabel": "Slug", "xtype": "textfield", "fieldHidden": False, "header": "slug", "allowBlank": False, "helpText": "", "maxLength": 50, "name": "slug", "width": 400, "value": ""},
             {"fieldLabel": "Text", "allowBlank": False, "fieldHidden": False, "name": "text", "header": "text", "helpText": "", "xtype": "textarea", "value": ""},
             {"xtype": "combo", "forceSelection": True, "editable": False, "triggerAction": 'all', "hiddenName": "author", "fieldLabel": "Author", "name": "author", "header": "author", "fieldHidden": False, "value": "", "width": 150, "allowBlank": True, "helpText": "", "mode": "local", "store": [["", "---------"], ['1', 'toto'],], "listWidth": "auto"},
             {"xtype": "combo", "forceSelection": True, "editable": False, "triggerAction": 'all', "hiddenName": "title", "fieldLabel": "Title", "name": "title", "header": "title", "fieldHidden": False, "value": 1, "width": 150, "allowBlank": False, "helpText": "", "mode": "local", "store": [["", "---------"], ["1", "Mr."], ["2", "Mrs."], ["3", "Ms."]], "listWidth": "auto"},
             {"fieldLabel": "Birth date", "allowBlank": True, "fieldHidden": False, "name": "birth_date", "header": "birth_date", "helpText": "", "xtype": "datefield", "value": "2000-01-02"},
-            {"fieldLabel": "Yesno", "xtype": "checkbox", "fieldHidden": False, "value": True, "header": "yesno", "allowBlank": True, "helpText": "", "name": "yesno", "checked": True}
-            ]}
+            {"fieldLabel": "Yesno", "xtype": "checkbox", "fieldHidden": False, "value": True, "header": "yesno", "allowBlank": True, "helpText": "", "name": "yesno", "checked": True, 'boxLabel': 'Yesno?', 'hideLabel': True,}
+            ],
+            'buttons': {'reset': 'Reset', 'submit': 'Save Whatamess'},
+        }
         self.assertEqual(expct, simplejson.loads(cf.as_extjs()))
 
     def testModelFormComplexwithAuthorOnlyFields(self):
         """Test a ModelForm with lot of fields and an Author filed with data, get only 3 fields
         """
+        self.maxDiff = None
         from datetime import date
         auth = Author.objects.create(name="toto", title="toto", birth_date=date(2000,1,2))
         wam1 = Whatamess.objects.create(name="toto", title=1, birth_date=date(2000,1,2), yesno=True, number=1)
         cf = WhatamessForm(instance=wam1)
-        expct = {"slug" : {"fieldLabel": "Slug", "xtype": "textfield", "fieldHidden": False, "header": "slug", "allowBlank": False, "helpText": "", "maxLength": 50, "name": "slug", "value": ""},
+        expct = {"slug" : {"fieldLabel": "Slug", "xtype": "textfield", "fieldHidden": False, "header": "slug", "allowBlank": False, "helpText": "", "maxLength": 50, "name": "slug", "value": "", "width": 400},
                  "text" : {"fieldLabel": "Text", "allowBlank": False, "fieldHidden": False, "name": "text", "header": "text", "helpText": "", "xtype": "textarea", "value": ""},
-                 "yesno" : {"fieldLabel": "Yesno", "xtype": "checkbox", "fieldHidden": False, "value": True, "header": "yesno", "allowBlank": True, "helpText": "", "name": "yesno", "checked": True}
+                 "yesno" : {"fieldLabel": "Yesno", "xtype": "checkbox", "fieldHidden": False, "value": True, "header": "yesno", "allowBlank": True, "helpText": "", "name": "yesno", "checked": True, 'boxLabel': 'Yesno?', 'hideLabel': True,}
                 }
         self.assertEqual(expct, cf.as_extjsfields(["slug", "text", "yesno"]))
 
@@ -660,6 +678,7 @@ class OtherTests(TestCase):
         self.assertTrue(result in response.content)
         self.client.login(username="extjs", password="extjs")
         response = self.client.get(reverse('test_decorator'))
+        print str(response)
         self.assertTrue("I was here" in response.content)
 
     def testObjector404(self):
