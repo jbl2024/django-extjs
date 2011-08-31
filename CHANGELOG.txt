@@ -1,4 +1,4 @@
-2011-08-31 15:32  django-extjs  0.4
+2011-08-31 15:32  django-extjs  0.2
 
     * Add file upload support
     * Reset the form when submit was successful
