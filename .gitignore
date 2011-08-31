@@ -1,5 +1,6 @@
 *.svn
 *.pyc
+*.swp
 includes.py
 dist/
 *.egg-info
