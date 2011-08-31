@@ -1,5 +1,9 @@
 2011-08-31 15:32  django-extjs  0.2
 
+    * Move statics to extjs/static dir for Django 1.3 collectstatic
+
+    Thanks to Chris Rose:
+
     * Add file upload support
     * Reset the form when submit was successful
     * Display checkbox labels to the right of the checkbox
@@ -23,8 +27,6 @@
     * Make context an optional argument for JsonSuccess
     * Add `extjs.utils.JsonSuccess` helper for a json successful response shortcut
     * Add `extjs.utils.JsonSerialize` helper function, for using JsonResponse manually, instead of JsonSuccess or JsonError
-
-    * Thanks to : Chris Rose
 
     TODO :
 
