@@ -678,7 +678,6 @@ class OtherTests(TestCase):
         self.assertTrue(result in response.content)
         self.client.login(username="extjs", password="extjs")
         response = self.client.get(reverse('test_decorator'))
-        print str(response)
         self.assertTrue("I was here" in response.content)
 
     def testObjector404(self):
