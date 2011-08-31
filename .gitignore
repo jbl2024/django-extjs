@@ -1,3 +1,11 @@
 *.svn
 *.pyc
 includes.py
+dist/
+*.egg-info
+tests/.installed.cfg
+tests/bin/*
+tests/develop-eggs/*
+tests/downloads/*
+tests/eggs/*
+tests/parts/*
