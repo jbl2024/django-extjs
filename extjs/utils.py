@@ -126,7 +126,7 @@ class ExtJSONEncoder(DjangoJSONEncoder):
     DJANGO_EXT_WIDGET_TYPES = {
         widgets.Textarea: ["Ext.form.TextArea", TEXTAREA_EDITOR],
     }
-    
+
     EXT_DATE_ALT_FORMATS = 'm/d/Y|n/j/Y|n/j/y|m/j/y|n/d/y|m/j/Y|n/d/Y|m-d-y|m-d-Y|m/d|m-d|md|mdy|mdY|d|Y-m-d'
 
     EXT_TIME_ALT_FORMATS = 'm/d/Y|m-d-y|m-d-Y|m/d|m-d|d'
@@ -201,7 +201,7 @@ class ExtJSONEncoder(DjangoJSONEncoder):
                 #print o.field.widget.__class__
                 if o.field.widget.__class__ in self.DJANGO_EXT_WIDGET_TYPES:
                     default_config.update(self.DJANGO_EXT_WIDGET_TYPES[o.field.widget.__class__][1])
-                
+
             else:
                 default_config.update(self.EXT_DEFAULT_CONFIG)
             config = deepcopy(default_config)
@@ -210,13 +210,13 @@ class ExtJSONEncoder(DjangoJSONEncoder):
 
                 # Adapt the value with type of field
                 if dj == 'size':
-                    max_length = getattr(o.field, 'max_length', None)
-                    if max_length is not None and type(max_length) is int:
-                        #if o.field.__class__ in (fields.DateField, fields.DateTimeField, fields.SplitDateTimeField, fields.TimeField):
-                        #    v += 8
-                        #Django's max_length attribute is the number of characters,
+                    v = o.field.widget.attrs.get(dj, None)
+                    if v is not None:
+                        if o.field.__class__ in (fields.DateField, fields.DateTimeField, fields.SplitDateTimeField, fields.TimeField):
+                            v += 8
+                        #Django's size attribute is the number of characters,
                         #so multiply by the pixel width of a character
-                        v = max_length * self.CHAR_PIXEL_WIDTH
+                        v = v * self.CHAR_PIXEL_WIDTH
                 elif dj == 'hidden':
                     v = o.field.widget.attrs.get(dj, default_config.get('fieldHidden', ext[1]))
                 elif dj == 'name':

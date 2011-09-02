@@ -7,7 +7,7 @@ readme = open(os.path.join(os.path.dirname(__file__), 'README.md')).read()
 
 setup(
         name     = 'django-extjs',
-        version  = '0.2-beta',
+        version  = '0.2-beta2',
         packages = ['extjs'],
 
         requires = ['python (>= 2.4)', 'django (>= 1.0)'],
