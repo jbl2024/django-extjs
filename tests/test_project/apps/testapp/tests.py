@@ -45,7 +45,7 @@ class FormsTestCase(TestCase):
         cf = AuthorForm()
         expct = {"items":[
             {"fieldLabel": "Name", "xtype": "textfield", "fieldHidden": False, "header": "name", "allowBlank": False, "helpText": "", "maxLength": 100, "name": "name", "value": "Platon",},
-            {"xtype": "combo", "forceSelection": True, "editable": False, "triggerAction": 'all', "hiddenName": "title", "fieldLabel": "Title", "name": "title", "header": "title", "fieldHidden": False, "value": "", "width": 150, "allowBlank": False, "helpText": "", "mode": "local", "store": [["", "---------"], ["MR", "Mr."], ["MRS", "Mrs."], ["MS", "Ms."]], "listWidth": "auto"},
+            {"xtype": "combo", "forceSelection": True, "editable": True, 'selectOnFocus': True, 'typeAhead': True, "triggerAction": 'all', "hiddenName": "title", "fieldLabel": "Title", "name": "title", "header": "title", "fieldHidden": False, "value": "", "width": 150, "allowBlank": False, "helpText": "", "mode": "local", "store": [["", "---------"], ["MR", "Mr."], ["MRS", "Mrs."], ["MS", "Ms."]], "listWidth": "auto"},
             {"fieldLabel": "Birth date", "allowBlank": True, "fieldHidden": False, "name": "birth_date", "header": "birth_date", "helpText": "", "xtype": "datefield"}
             ],
             'buttons': {'reset': 'Reset', 'submit': 'Save Author'},
@@ -74,8 +74,8 @@ class FormsTestCase(TestCase):
             {"fieldLabel": "Number", "allowBlank": False, "fieldHidden": False, "name": "number", "header": "number", "helpText": "", "xtype": "numberfield"},
             {"fieldLabel": "Slug", "xtype": "textfield", "fieldHidden": False, "header": "slug", "allowBlank": False, "helpText": "", "maxLength": 50, "name": "slug",},
             {"fieldLabel": "Text", "allowBlank": False, "fieldHidden": False, "name": "text", "header": "text", "helpText": "", "xtype": "textarea"},
-            {"xtype": "combo", "forceSelection": True, "editable": False, "triggerAction": 'all', "hiddenName": "author", "fieldLabel": "Author", "name": "author", "header": "author", "fieldHidden": False, "value": "", "allowBlank": True, "helpText": "", "mode": "local", "store": [["", "---------"]], "listWidth": "auto", 'width': 150,},
-            {"xtype": "combo", "forceSelection": True, "editable": False, "triggerAction": 'all', "hiddenName": "title", "fieldLabel": "Title", "name": "title", "header": "title", "fieldHidden": False, "value": "", "allowBlank": False, "helpText": "", "mode": "local", "store": [["", "---------"], ["1", "Mr."], ["2", "Mrs."], ["3", "Ms."]], "listWidth": "auto", 'width': 150,},
+            {"xtype": "combo", "forceSelection": True, "editable": True, 'selectOnFocus': True, 'typeAhead': True, "triggerAction": 'all', "hiddenName": "author", "fieldLabel": "Author", "name": "author", "header": "author", "fieldHidden": False, "value": "", "allowBlank": True, "helpText": "", "mode": "local", "store": [["", "---------"]], "listWidth": "auto", 'width': 150,},
+            {"xtype": "combo", "forceSelection": True, "editable": True, 'selectOnFocus': True, 'typeAhead': True, "triggerAction": 'all', "hiddenName": "title", "fieldLabel": "Title", "name": "title", "header": "title", "fieldHidden": False, "value": "", "allowBlank": False, "helpText": "", "mode": "local", "store": [["", "---------"], ["1", "Mr."], ["2", "Mrs."], ["3", "Ms."]], "listWidth": "auto", 'width': 150,},
             {"fieldLabel": "Birth date", "allowBlank": True, "fieldHidden": False, "name": "birth_date", "header": "birth_date", "helpText": "", "xtype": "datefield"},
             {"fieldLabel": "Yesno", "xtype": "checkbox", "fieldHidden": False, "value": False, "header": "yesno", "allowBlank": True, "helpText": "", "name": "yesno", 'checked': False, 'boxLabel': 'Yesno?', 'hideLabel': True,}
             ],
@@ -88,7 +88,7 @@ class FormsTestCase(TestCase):
         """
         cf = WhatamessFormFK()
         expct = {"items":[
-            {"xtype": "combo", "forceSelection": True, "editable": False, "triggerAction": 'all', "hiddenName": "author", "fieldLabel": "Author", "name": "author", "header": "author", "fieldHidden": False, "value": "", "width": 150, "allowBlank": True, "helpText": "", "mode": "local", "store": [["", "---------"]], "listWidth": "auto"},
+            {"xtype": "combo", "forceSelection": True, "editable": True, 'selectOnFocus': True, 'typeAhead': True, "triggerAction": 'all', "hiddenName": "author", "fieldLabel": "Author", "name": "author", "header": "author", "fieldHidden": False, "value": "", "width": 150, "allowBlank": True, "helpText": "", "mode": "local", "store": [["", "---------"]], "listWidth": "auto"},
             ],
             'buttons': {'reset': 'Reset', 'submit': 'Save Whatamess'},
             'layout': ['author']
@@ -118,8 +118,8 @@ class FormsTestCase(TestCase):
             {"fieldLabel": "Number", "allowBlank": False, "fieldHidden": False, "name": "number", "header": "number", "helpText": "", "xtype": "numberfield"},
             {"fieldLabel": "Slug", "xtype": "textfield", "fieldHidden": False, "header": "slug", "allowBlank": False, "helpText": "", "maxLength": 50, "name": "slug",},
             {"fieldLabel": "Text", "allowBlank": False, "fieldHidden": False, "name": "text", "header": "text", "helpText": "", "xtype": "textarea"},
-            {"xtype": "combo", "forceSelection": True, "editable": False, "triggerAction": 'all', "hiddenName": "author", "fieldLabel": "Author", "name": "author", "header": "author", "fieldHidden": False, "value": "", "width": 150, "allowBlank": True, "helpText": "", "mode": "local", "store": [["", "---------"], ['1', 'toto'],], "listWidth": "auto"},
-            {"xtype": "combo", "forceSelection": True, "editable": False, "triggerAction": 'all', "hiddenName": "title", "fieldLabel": "Title", "name": "title", "header": "title", "fieldHidden": False, "value": "", "width": 150, "allowBlank": False, "helpText": "", "mode": "local", "store": [["", "---------"], ["1", "Mr."], ["2", "Mrs."], ["3", "Ms."]], "listWidth": "auto"},
+            {"xtype": "combo", "forceSelection": True, "editable": True, 'selectOnFocus': True, 'typeAhead': True, "triggerAction": 'all', "hiddenName": "author", "fieldLabel": "Author", "name": "author", "header": "author", "fieldHidden": False, "value": "", "width": 150, "allowBlank": True, "helpText": "", "mode": "local", "store": [["", "---------"], ['1', 'toto'],], "listWidth": "auto"},
+            {"xtype": "combo", "forceSelection": True, "editable": True, 'selectOnFocus': True, 'typeAhead': True, "triggerAction": 'all', "hiddenName": "title", "fieldLabel": "Title", "name": "title", "header": "title", "fieldHidden": False, "value": "", "width": 150, "allowBlank": False, "helpText": "", "mode": "local", "store": [["", "---------"], ["1", "Mr."], ["2", "Mrs."], ["3", "Ms."]], "listWidth": "auto"},
             {"fieldLabel": "Birth date", "allowBlank": True, "fieldHidden": False, "name": "birth_date", "header": "birth_date", "helpText": "", "xtype": "datefield"},
             {"fieldLabel": "Yesno", "xtype": "checkbox", "fieldHidden": False, "value": False, "header": "yesno", "allowBlank": True, "helpText": "", "name": "yesno", 'checked': False, 'boxLabel': 'Yesno?', 'hideLabel': True,}
             ],
@@ -215,8 +215,8 @@ class FormsDataTestCase(TestCase):
             {"fieldLabel": "Number", "allowBlank": False, "fieldHidden": False, "name": "number", "header": "number", "helpText": "", "xtype": "numberfield", "value":1},
             {"fieldLabel": "Slug", "xtype": "textfield", "fieldHidden": False, "header": "slug", "allowBlank": False, "helpText": "", "maxLength": 50, "name": "slug", "value": ""},
             {"fieldLabel": "Text", "allowBlank": False, "fieldHidden": False, "name": "text", "header": "text", "helpText": "", "xtype": "textarea", "value": ""},
-            {"xtype": "combo", "forceSelection": True, "editable": False, "triggerAction": 'all', "hiddenName": "author", "fieldLabel": "Author", "name": "author", "header": "author", "fieldHidden": False, "value": "", "width": 150, "allowBlank": True, "helpText": "", "mode": "local", "store": [["", "---------"], ['1', 'toto'],], "listWidth": "auto"},
-            {"xtype": "combo", "forceSelection": True, "editable": False, "triggerAction": 'all', "hiddenName": "title", "fieldLabel": "Title", "name": "title", "header": "title", "fieldHidden": False, "value": 1, "width": 150, "allowBlank": False, "helpText": "", "mode": "local", "store": [["", "---------"], ["1", "Mr."], ["2", "Mrs."], ["3", "Ms."]], "listWidth": "auto"},
+            {"xtype": "combo", "forceSelection": True, "editable": True, 'selectOnFocus': True, 'typeAhead': True, "triggerAction": 'all', "hiddenName": "author", "fieldLabel": "Author", "name": "author", "header": "author", "fieldHidden": False, "value": "", "width": 150, "allowBlank": True, "helpText": "", "mode": "local", "store": [["", "---------"], ['1', 'toto'],], "listWidth": "auto"},
+            {"xtype": "combo", "forceSelection": True, "editable": True, 'selectOnFocus': True, 'typeAhead': True, "triggerAction": 'all', "hiddenName": "title", "fieldLabel": "Title", "name": "title", "header": "title", "fieldHidden": False, "value": 1, "width": 150, "allowBlank": False, "helpText": "", "mode": "local", "store": [["", "---------"], ["1", "Mr."], ["2", "Mrs."], ["3", "Ms."]], "listWidth": "auto"},
             {"fieldLabel": "Birth date", "allowBlank": True, "fieldHidden": False, "name": "birth_date", "header": "birth_date", "helpText": "", "xtype": "datefield", "value": "2000-01-02"},
             {"fieldLabel": "Yesno", "xtype": "checkbox", "fieldHidden": False, "value": True, "header": "yesno", "allowBlank": True, "helpText": "", "name": "yesno", "checked": True, 'boxLabel': 'Yesno?', 'hideLabel': True,}
             ],
