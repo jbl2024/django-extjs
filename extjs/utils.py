@@ -53,8 +53,10 @@ class ExtJSONEncoder(DjangoJSONEncoder):
         'width': 150,
         'xtype': 'combo',
         'forceSelection': True,
-        'editable': False,
+        'editable': True,
         'triggerAction': 'all',
+        'selectOnFocus': True,
+        'typeAhead': True,
     }
 
     MULTI_SELECT_EDITOR = {
