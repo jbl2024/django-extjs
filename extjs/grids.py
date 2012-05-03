@@ -41,7 +41,7 @@ class ModelGrid(object):
 
     # Fields describe default subset of fields from final mapping.
     fields = None
-    #exclude = None
+    exclude = None
 
 
     model = None
@@ -59,11 +59,18 @@ class ModelGrid(object):
 
 
         # Excludes and Includes
-        #exclude = exclude or self.exclude
+        exclude = exclude or self.exclude
 
         self.columns = {}        # holds the fields
 
-        model_fields = self.model._meta._fields()
+        model_fields = []
+        if exclude:
+            for field in self.model._meta._fields():
+                if field.name not in exclude:
+                    model_fields.append(field)
+        else:
+            model_fields = self.model._meta._fields()
+            
         base_fields = model_fields
 
         # Model base fields and needed fields
